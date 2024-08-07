@@ -24,15 +24,23 @@ public class Submarine {
     public Submarine() {
         float depth = Random.Range(-4.5f, 2);
 
-        //Nikki
-        //For now, I limited the range of the velocity from -1 to 0.5f as I had some problems with the translate method
-        //Where the submarine would not move at all.
         velocity = Random.Range(0.5f, 1.5f);
+
+        if (Random.Range(0.0f, 1.0f) >= 0.5f) {
+            velocity *= -1;
+        }
+
+        Vector3 initialPosition;
+        if (velocity < 0) {
+            initialPosition = new Vector3(12, depth, 0);
+        } else {
+            initialPosition = new Vector3(-12, depth, 0);
+        }
 
         go = Utilities.newSpriteGameObject(
             "Submarine",
             new Vector3(2, 0.5f, 1),
-            new Vector3(0, depth, 0),
+            initialPosition,
             new Color(1.0f, 0.0f, 0.0f, 1.0f)
         );
     }
@@ -60,6 +68,7 @@ public class SubBoom : MonoBehaviour
     GameObject destroyer;
     GameObject depthCharge;
     List<Submarine> submarines;
+    float timeSinceSubAdded = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -116,6 +125,13 @@ public class SubBoom : MonoBehaviour
         // Update submarine positions
         foreach (var sub in submarines) {
             sub.UpdatePosition(Time.deltaTime);
+        }
+
+        // Add a new submarine if it's been at least 10 seconds
+        timeSinceSubAdded += Time.deltaTime;
+        if (timeSinceSubAdded > 10) {
+            timeSinceSubAdded = 0.0f;
+            submarines.Add(new Submarine());
         }
     }
 
