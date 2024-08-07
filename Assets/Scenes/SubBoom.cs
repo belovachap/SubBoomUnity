@@ -23,7 +23,12 @@ public class Submarine {
 
     public Submarine() {
         float depth = Random.Range(-4.5f, 2);
-        velocity = Random.Range(-1, 1);
+
+        //Nikki
+        //For now, I limited the range of the velocity from -1 to 0.5f as I had some problems with the translate method
+        //Where the submarine would not move at all.
+        velocity = Random.Range(0.5f, 1.5f);
+
         go = Utilities.newSpriteGameObject(
             "Submarine",
             new Vector3(2, 0.5f, 1),
@@ -53,6 +58,7 @@ public class SubBoom : MonoBehaviour
 {
     GameObject ocean;
     GameObject destroyer;
+    GameObject depthCharge;
     List<Submarine> submarines;
 
     // Start is called before the first frame update
@@ -79,16 +85,22 @@ public class SubBoom : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Vector3 pos = destroyer.transform.position;
+
         // Handle user input
         if (Input.GetKeyDown("space"))
         {
             Debug.Log("space key was pressed");
-            destroyer.transform.position = new Vector3(0, 3.1f, 0);
+            //Nikki
+            //get destroyer pos
+            //create charge from destroyer pos with user input
+            //have charge move in a linear direction downwards
+            //user input then blows up charge to destroy submarine
+            CreateCharge(pos);
         }
 
         if (Input.GetKey("left"))
         {
-            Vector3 pos = destroyer.transform.position;
             pos.x -= Time.deltaTime * 3;
             pos.x = Mathf.Max(pos.x, -9.25f);
             destroyer.transform.position = pos;
@@ -96,7 +108,6 @@ public class SubBoom : MonoBehaviour
 
         if (Input.GetKey("right"))
         {
-            Vector3 pos = destroyer.transform.position;
             pos.x += Time.deltaTime * 3;
             pos.x = Mathf.Min(pos.x, 9.25f);
             destroyer.transform.position = pos;
@@ -105,6 +116,33 @@ public class SubBoom : MonoBehaviour
         // Update submarine positions
         foreach (var sub in submarines) {
             sub.UpdatePosition(Time.deltaTime);
+        }
+    }
+
+    void CreateCharge(Vector3 destroyerPosition)
+    {
+        Texture2D tex = Resources.Load<Texture2D>("blank_circle");
+        Sprite sprite;
+        SpriteRenderer renderer;
+
+        depthCharge = new GameObject("Depth Charge");
+        depthCharge.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+        depthCharge.transform.position = destroyerPosition;
+
+        renderer = depthCharge.AddComponent<SpriteRenderer>();
+        renderer.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+        sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), (float)tex.width);
+        renderer.sprite = sprite;
+
+        //Nikki
+        //neither of these inputs work since the if statement to make this method happen in the first place only checks if the space key was pressed
+        //not if the space key was held or released
+        if (Input.GetKey("space"))
+            depthCharge.transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
+
+        if (Input.GetKeyUp("space"))
+        {
+            Debug.Log("Space Key was released!");
         }
     }
 }
