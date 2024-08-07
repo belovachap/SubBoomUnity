@@ -2,22 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+static class Utilities {
+    public static GameObject newSpriteGameObject(string name, Vector3 localScale, Vector3 position, Color color) {
+        GameObject go = new GameObject(name);
+        go.transform.localScale = localScale;
+        go.transform.position = position;
+        SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+        Texture2D tex = Resources.Load<Texture2D>("blank_square");
+        Sprite sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
+        renderer.sprite = sprite;
+        renderer.color = color;
+
+        return go;
+    }
+}
+
 public class Submarine {
-    float depth;
     float velocity;
     GameObject go;
 
     public Submarine() {
-        depth = Random.Range(-4.5f, 2);
+        float depth = Random.Range(-4.5f, 2);
         velocity = Random.Range(-1, 1);
-        go = new GameObject("Submarine");
-        go.transform.localScale = new Vector3(2, 0.5f, 1);
-        go.transform.position = new Vector3(0, depth, 0);
-        SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
-        renderer.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-        Texture2D tex = Resources.Load<Texture2D>("blank_square");
-        Sprite sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
-        renderer.sprite = sprite;
+        go = Utilities.newSpriteGameObject(
+            "Submarine",
+            new Vector3(2, 0.5f, 1),
+            new Vector3(0, depth, 0),
+            new Color(1.0f, 0.0f, 0.0f, 1.0f)
+        );
     }
 
     public void UpdatePosition(float dt) {
@@ -46,29 +58,20 @@ public class SubBoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Texture2D tex = Resources.Load<Texture2D>("blank_square");
-        Sprite sprite;
-        SpriteRenderer renderer;
-
-        // Setup the ocean background
-        ocean = new GameObject("Ocean");
-        ocean.transform.localScale = new Vector3(22, 8, 1);
-        ocean.transform.position = new Vector3(0, -1, 0);
-        renderer = ocean.AddComponent<SpriteRenderer>();
-        renderer.color = new Color(0.0f, 0.0f, 1.0f, 1.0f);
-        sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
-        renderer.sprite = sprite;
+        ocean = Utilities.newSpriteGameObject(
+            "Ocean",
+            new Vector3(22, 8, 1),
+            new Vector3(0, -1, 0),
+            new Color(0.0f, 0.0f, 1.0f, 1.0f)
+        );
     
-        // Setup the destroyer
-        destroyer = new GameObject("Destroyer");
-        destroyer.transform.localScale = new Vector3(3, 0.5f, 1);
-        destroyer.transform.position = new Vector3(0, 3.1f, 0);
-        renderer = destroyer.AddComponent<SpriteRenderer>();
-        renderer.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
-        renderer.sprite = sprite;
+        destroyer = Utilities.newSpriteGameObject(
+            "Destroyer",
+            new Vector3(3, 0.5f, 1),
+            new Vector3(0, 3.1f, 0),
+            new Color(0.0f, 0.0f, 0.0f, 1.0f)
+        );
 
-        // Setup empty submarines list
         submarines = new List<Submarine>();
         submarines.Add(new Submarine());
     }
