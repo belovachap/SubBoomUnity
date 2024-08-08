@@ -169,13 +169,32 @@ public class SubBoom : MonoBehaviour
             submarines.Add(new Submarine());
         }
 
+        // Update depth charges, keep track of exploded charges
+        List<DepthCharge> explodedCharges = new List<DepthCharge>();
+        foreach (var dc in depthCharges) {
+            dc.Update(Time.deltaTime);
+            if (dc.secondsSinceDropped >= dc.timeUntilExplode) {
+                explodedCharges.Add(dc);
+            }
+        }
+
+        // Clear exploded depth charges
+        // TODO: create an explosion object in its place
+        foreach (var dc in explodedCharges) {
+            Destroy(dc.depthCharge);
+            depthCharges.Remove(dc);
+        }
+
         scoreText.text = "Score: " + score.ToString();
     }
 }
 
 public class DepthCharge
 {
-    GameObject depthCharge;
+    public GameObject depthCharge;
+    float velocity = -0.5f;
+    public float secondsSinceDropped = 0.0f;
+    public float timeUntilExplode = 10.0f;
 
     public DepthCharge(Vector2 destroyerPosition)
     {
@@ -199,5 +218,12 @@ public class DepthCharge
         //if a charge's collision makes contact with a submarine's collision
         //create explosion effect, deactivate/delete charge, and deactivate/delete submarine
         Debug.Log("Charge Exploded!");
+    }
+
+    public void Update(float dt) {
+        secondsSinceDropped += dt;
+        Vector2 pos = depthCharge.transform.position;
+        pos.y += dt * velocity;
+        depthCharge.transform.position = pos;
     }
 }
