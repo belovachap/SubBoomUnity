@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 static class Utilities {
     public static GameObject newSpriteGameObject(string name, Vector3 localScale, Vector3 position, Color color) {
@@ -127,6 +128,10 @@ public class SubBoom : MonoBehaviour
             pos.x = Mathf.Min(pos.x, 9.25f);
             destroyer.transform.position = pos;
             score += 1;
+        }
+
+        if (Input.GetKey("escape")) {
+            SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
         }
 
         // Update submarine positions
