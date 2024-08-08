@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 static class Utilities {
     public static GameObject newSpriteGameObject(string name, Vector3 localScale, Vector3 position, Color color) {
@@ -64,11 +65,15 @@ public class Submarine {
 
 public class SubBoom : MonoBehaviour
 {
+    [SerializeField]
+    Text scoreText;
+
     GameObject ocean;
     GameObject destroyer;
     GameObject depthCharge;
     List<Submarine> submarines;
     float timeSinceSubAdded = 0.0f;
+    int score = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -113,6 +118,7 @@ public class SubBoom : MonoBehaviour
             pos.x -= Time.deltaTime * 3;
             pos.x = Mathf.Max(pos.x, -9.25f);
             destroyer.transform.position = pos;
+            score += 1;
         }
 
         if (Input.GetKey("right"))
@@ -120,6 +126,7 @@ public class SubBoom : MonoBehaviour
             pos.x += Time.deltaTime * 3;
             pos.x = Mathf.Min(pos.x, 9.25f);
             destroyer.transform.position = pos;
+            score += 1;
         }
 
         // Update submarine positions
@@ -133,6 +140,8 @@ public class SubBoom : MonoBehaviour
             timeSinceSubAdded = 0.0f;
             submarines.Add(new Submarine());
         }
+
+        scoreText.text = "Score: " + score.ToString();
     }
 
     void CreateCharge(Vector3 destroyerPosition)
