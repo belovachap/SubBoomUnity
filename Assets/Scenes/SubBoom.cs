@@ -71,8 +71,12 @@ public class SubBoom : MonoBehaviour
 
     GameObject ocean;
     GameObject destroyer;
-    GameObject depthCharge;
+
     List<Submarine> submarines;
+    List<DepthCharge> depthCharges;
+
+    GameObject currentDepthCharge;
+
     float timeSinceSubAdded = 0.0f;
     int score = 0;
 
@@ -95,12 +99,16 @@ public class SubBoom : MonoBehaviour
 
         submarines = new List<Submarine>();
         submarines.Add(new Submarine());
+
+        depthCharges = new List<DepthCharge>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 pos = destroyer.transform.position;
+        //Nikki
+        //changed vector3 to vector2 since we will only be messing with 2 axes
+        Vector2 pos = destroyer.transform.position;
 
         // Handle user input
         if (Input.GetKeyDown("space"))
@@ -111,7 +119,22 @@ public class SubBoom : MonoBehaviour
             //create charge from destroyer pos with user input
             //have charge move in a linear direction downwards
             //user input then blows up charge to destroy submarine
-            CreateCharge(pos);
+            depthCharges.Add(new DepthCharge(pos));
+            //need to figure out how to grab the index of the depthCharges List
+            //currentDepthCharge = depthCharges[0];
+        }
+
+        if (Input.GetKey("space") && depthCharges.Count > 0)
+        {
+            //depthCharge moves downward until space key is released 
+            //depthCharges[index].transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
+            //int chargeIndex = depthCharges.IndexOf(pos);
+        }
+
+        if (Input.GetKeyUp("space") && depthCharges.Count > 0)
+        {
+            //call ExplodeCharge() method
+            //clear depthCharges List and currentDepthCharge
         }
 
         if (Input.GetKey("left"))
@@ -148,8 +171,13 @@ public class SubBoom : MonoBehaviour
 
         scoreText.text = "Score: " + score.ToString();
     }
+}
 
-    void CreateCharge(Vector3 destroyerPosition)
+public class DepthCharge
+{
+    GameObject depthCharge;
+
+    public DepthCharge(Vector2 destroyerPosition)
     {
         Texture2D tex = Resources.Load<Texture2D>("blank_circle");
         Sprite sprite;
@@ -163,16 +191,13 @@ public class SubBoom : MonoBehaviour
         renderer.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
         sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), (float)tex.width);
         renderer.sprite = sprite;
+    }
 
-        //Nikki
-        //neither of these inputs work since the if statement to make this method happen in the first place only checks if the space key was pressed
-        //not if the space key was held or released
-        if (Input.GetKey("space"))
-            depthCharge.transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
-
-        if (Input.GetKeyUp("space"))
-        {
-            Debug.Log("Space Key was released!");
-        }
+    public void ExplodeCharge()
+    {
+        //first check for user input when space key is released
+        //if a charge's collision makes contact with a submarine's collision
+        //create explosion effect, deactivate/delete charge, and deactivate/delete submarine
+        Debug.Log("Charge Exploded!");
     }
 }
