@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,11 +25,11 @@ public class Submarine {
     GameObject go;
 
     public Submarine() {
-        float depth = Random.Range(-4.5f, 2);
+        float depth = UnityEngine.Random.Range(-4.5f, 2);
 
-        velocity = Random.Range(0.5f, 1.5f);
+        velocity = UnityEngine.Random.Range(0.5f, 1.5f);
 
-        if (Random.Range(0.0f, 1.0f) >= 0.5f) {
+        if (UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f) {
             velocity *= -1;
         }
 
@@ -77,8 +78,9 @@ public class SubBoom : MonoBehaviour
 
     GameObject currentDepthCharge;
 
+    float timePlayed = 0.0f;
     float timeSinceSubAdded = 0.0f;
-    int score = 0;
+    ulong score = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -106,6 +108,8 @@ public class SubBoom : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        timePlayed += Time.deltaTime;
+
         //Nikki
         //changed vector3 to vector2 since we will only be messing with 2 axes
         Vector2 pos = destroyer.transform.position;
@@ -154,6 +158,18 @@ public class SubBoom : MonoBehaviour
         }
 
         if (Input.GetKey("escape")) {
+            GameData gd = GameDataFileHandler.Load();
+            DateTime now = DateTime.Now;
+            gd.totalGamesPlayed += 1;
+            gd.totalSecondsPlayed += (ulong)timePlayed;
+            gd.lastScore = (ulong)score;
+            gd.lastScoreDateTime = now.ToString();
+            if (score >= gd.highScore) {
+                gd.highScore = score;
+                gd.highScoreDateTime = now.ToString();
+            }
+            GameDataFileHandler.Save(gd);
+
             SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
         }
 
