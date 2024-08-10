@@ -18,6 +18,9 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     Text highScoreText;
 
+    [SerializeField]
+    RawImage artworkRawImage;
+
     public void Start() {
         GameData gd = GameDataFileHandler.Load();
 
@@ -37,6 +40,14 @@ public class MainMenu : MonoBehaviour
         else {
             highScoreText.text = "High Score: " + gd.highScore.ToString() + " on " + gd.highScoreDateTime;
         }
+
+        string[] artwork = {
+            "sub_boom_art_one",
+            "sub_boom_art_two",
+            "sub_boom_art_three",
+            "sub_boom_art_four"
+        };
+        artworkRawImage.texture = Resources.Load<Texture2D>(artwork[Random.Range(0, 3)]);
     }
 
     public void QuitButtonClick ()
