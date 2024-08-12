@@ -1,9 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
 
 static class Utilities {
     public static GameObject newSpriteGameObject(string name, Vector3 localScale, Vector3 position, Color color) {
@@ -15,6 +15,7 @@ static class Utilities {
         Sprite sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
         renderer.sprite = sprite;
         renderer.color = color;
+        BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
 
         return go;
     }
@@ -22,14 +23,14 @@ static class Utilities {
 
 public class Submarine {
     float velocity;
-    GameObject go;
+    public GameObject submarine;
 
     public Submarine() {
-        float depth = UnityEngine.Random.Range(-4.5f, 2);
+        float depth = Random.Range(-4.5f, 2);
 
-        velocity = UnityEngine.Random.Range(0.5f, 1.5f);
+        velocity = Random.Range(0.5f, 1.5f);
 
-        if (UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f) {
+        if (Random.Range(0.0f, 1.0f) >= 0.5f) {
             velocity *= -1;
         }
 
@@ -40,7 +41,7 @@ public class Submarine {
             initialPosition = new Vector3(-12, depth, 0);
         }
 
-        go = Utilities.newSpriteGameObject(
+        submarine = Utilities.newSpriteGameObject(
             "Submarine",
             new Vector3(2, 0.5f, 1),
             initialPosition,
@@ -49,7 +50,7 @@ public class Submarine {
     }
 
     public void UpdatePosition(float dt) {
-        Vector3 pos = go.transform.position;
+        Vector3 pos = submarine.transform.position;
         pos.x += dt * velocity;
 
         // Wrap the subs around if they've wandered off screen
@@ -61,7 +62,16 @@ public class Submarine {
             pos.x = -12;
         }
 
-        go.transform.position = pos;
+        submarine.transform.position = pos;
+    }
+
+    //this isn't working
+    private void OnCollisionEnter(BoxCollider2D collision)
+    {
+        if (collision.gameObject.name == "Explosion")
+        {
+            Debug.Log("Submarine Down!");
+        }
     }
 }
 
@@ -75,12 +85,12 @@ public class SubBoom : MonoBehaviour
 
     List<Submarine> submarines;
     List<DepthCharge> depthCharges;
+    List<ExplosionEffect> explosions;
 
     GameObject currentDepthCharge;
 
-    float timePlayed = 0.0f;
     float timeSinceSubAdded = 0.0f;
-    ulong score = 0;
+    int score = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -88,7 +98,7 @@ public class SubBoom : MonoBehaviour
         ocean = Utilities.newSpriteGameObject(
             "Ocean",
             new Vector3(22, 8, 1),
-            new Vector3(0, -1, 0),
+            new Vector3(0, -1, 100),
             new Color(0.0f, 0.0f, 1.0f, 1.0f)
         );
     
@@ -103,29 +113,18 @@ public class SubBoom : MonoBehaviour
         submarines.Add(new Submarine());
 
         depthCharges = new List<DepthCharge>();
+        explosions = new List<ExplosionEffect>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        timePlayed += Time.deltaTime;
-
-        //Nikki
-        //changed vector3 to vector2 since we will only be messing with 2 axes
         Vector2 pos = destroyer.transform.position;
 
         // Handle user input
         if (Input.GetKeyDown("space"))
         {
-            Debug.Log("space key was pressed");
-            //Nikki
-            //get destroyer pos
-            //create charge from destroyer pos with user input
-            //have charge move in a linear direction downwards
-            //user input then blows up charge to destroy submarine
             depthCharges.Add(new DepthCharge(pos));
-            //need to figure out how to grab the index of the depthCharges List
-            //currentDepthCharge = depthCharges[0];
         }
 
         if (Input.GetKey("space") && depthCharges.Count > 0)
@@ -158,18 +157,6 @@ public class SubBoom : MonoBehaviour
         }
 
         if (Input.GetKey("escape")) {
-            GameData gd = GameDataFileHandler.Load();
-            DateTime now = DateTime.Now;
-            gd.totalGamesPlayed += 1;
-            gd.totalSecondsPlayed += (ulong)timePlayed;
-            gd.lastScore = (ulong)score;
-            gd.lastScoreDateTime = now.ToString();
-            if (score >= gd.highScore) {
-                gd.highScore = score;
-                gd.highScoreDateTime = now.ToString();
-            }
-            GameDataFileHandler.Save(gd);
-
             SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
         }
 
@@ -197,11 +184,56 @@ public class SubBoom : MonoBehaviour
         // Clear exploded depth charges
         // TODO: create an explosion object in its place
         foreach (var dc in explodedCharges) {
+            explosions.Add(new ExplosionEffect(new Vector2(
+                dc.depthCharge.transform.position.x,
+                dc.depthCharge.transform.position.y)));
+
             Destroy(dc.depthCharge);
             depthCharges.Remove(dc);
         }
 
+        // Create a foreach loop for the explosions list
+        // That increases the scale of the explosion effect for a specified duration
+        foreach (var ec in explosions)
+        {
+            if (ec.secondsSinceDropped >= ec.timeUntilExplode)
+            {
+                Destroy(ec.explodeCharge);
+                explosions.Remove(ec);
+                break;
+            }
+            ec.Update(Time.deltaTime);
+        }
+
+        //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
+        //if so, destroy submarine and/or if destroyer, game over
+
+        //update: it may be easier to try the method OnCollisionEnter2D
+        //if we are able to get both box colliders somehow
+        foreach (var ec in explosions)
+        {
+            foreach (var sub in submarines)
+            {
+                //this isn't working for some reason? not even the debug message is showing up.
+                if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching(sub.submarine.GetComponent<BoxCollider2D>()) == true)
+                {
+                    Debug.Log("This works!");
+                    Destroy(sub.submarine);
+                    submarines.Remove(sub);
+                }
+            }
+        }
+
         scoreText.text = "Score: " + score.ToString();
+    }
+
+    //this isn't meant to work anyways. but how am i getting a warning for incorrect signature??
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.name == "Explosion")
+        {
+            Debug.Log("Game Over!");
+        }
     }
 }
 
@@ -228,18 +260,66 @@ public class DepthCharge
         renderer.sprite = sprite;
     }
 
-    public void ExplodeCharge()
-    {
-        //first check for user input when space key is released
-        //if a charge's collision makes contact with a submarine's collision
-        //create explosion effect, deactivate/delete charge, and deactivate/delete submarine
-        Debug.Log("Charge Exploded!");
-    }
-
     public void Update(float dt) {
         secondsSinceDropped += dt;
         Vector2 pos = depthCharge.transform.position;
         pos.y += dt * velocity;
         depthCharge.transform.position = pos;
     }
+}
+
+public class ExplosionEffect
+{
+    public GameObject explodeCharge;
+
+    public float secondsSinceDropped = 0.0f;
+    public float timeUntilExplode = 3.0f;
+
+    public ExplosionEffect(Vector2 explosionPosition)
+    {
+        Texture2D textureOutline = Resources.Load<Texture2D>("outline_square");
+        Texture2D textureExplosion = Resources.Load<Texture2D>("blank_circle");
+        Sprite spriteOutline;
+        Sprite spriteCircle;
+        SpriteRenderer renderer;
+
+        explodeCharge = new GameObject("Explosion");
+        explodeCharge.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+        explodeCharge.transform.position = explosionPosition;
+
+        renderer = explodeCharge.AddComponent<SpriteRenderer>();
+        //renderer.color = new Color(0.2f, 0.3f, 0.4f, 0.0f);
+        spriteOutline = Sprite.Create(textureOutline,
+            new UnityEngine.Rect(0.0f, 0.0f, textureOutline.width, textureOutline.height),
+            new Vector2(0.5f, 0.5f), (float)textureOutline.width);
+        renderer.sprite = spriteOutline;
+
+        BoxCollider2D collider = explodeCharge.AddComponent<BoxCollider2D>();
+
+        /*
+        spriteCircle = Sprite.Create(textureExplosion,
+            new UnityEngine.Rect(0.0f, 0.0f, textureExplosion.width, textureExplosion.height),
+            new Vector2(0.5f, 0.5f), (float)textureExplosion.width);
+        renderer.sprite = spriteCircle;
+        */
+    }
+
+    //maybe add another variable to the method that will grab the current explodeCharge's collider component?
+    public void Update(float explosionDuration)
+    {
+        secondsSinceDropped += explosionDuration;
+        explodeCharge.transform.localScale += new Vector3 (explosionDuration, explosionDuration, 0);
+        //not sure how to increase explodeCharge collider with the way it is now
+        //update: okay so apparently the collider transforms with the local scale but idk why the collider isn't working then??
+    }
+
+    /*
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name == "Submarine")
+        {
+
+        }
+    }
+    */
 }
