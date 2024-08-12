@@ -67,15 +67,6 @@ public class Submarine {
 
         submarine.transform.position = pos;
     }
-
-    //this isn't working
-    private void OnCollisionEnter(BoxCollider2D collision)
-    {
-        if (collision.gameObject.name == "Explosion")
-        {
-            Debug.Log("Submarine Down!");
-        }
-    }
 }
 
 public class SubBoom : MonoBehaviour
@@ -229,15 +220,6 @@ public class SubBoom : MonoBehaviour
 
         scoreText.text = "Score: " + score.ToString();
     }
-
-    //this isn't meant to work anyways. but how am i getting a warning for incorrect signature??
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.name == "Explosion")
-        {
-            Debug.Log("Game Over!");
-        }
-    }
 }
 
 public class DepthCharge
@@ -293,17 +275,5 @@ public class ExplosionEffect
     {
         secondsSinceDropped += explosionDuration;
         explodeCharge.transform.localScale += new Vector3 (explosionDuration, explosionDuration, 0);
-        //not sure how to increase explodeCharge collider with the way it is now
-        //update: okay so apparently the collider transforms with the local scale but idk why the collider isn't working then??
     }
-
-    /*
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.name == "Submarine")
-        {
-
-        }
-    }
-    */
 }
