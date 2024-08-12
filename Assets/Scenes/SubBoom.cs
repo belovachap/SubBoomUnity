@@ -15,7 +15,8 @@ static class Utilities {
         Sprite sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
         renderer.sprite = sprite;
         renderer.color = color;
-        BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
+        go.AddComponent<Rigidbody2D>();
+        go.AddComponent<BoxCollider2D>();
 
         return go;
     }
