@@ -15,8 +15,10 @@ static class Utilities {
         Sprite sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
         renderer.sprite = sprite;
         renderer.color = color;
-        go.AddComponent<Rigidbody2D>();
-        go.AddComponent<BoxCollider2D>();
+        Rigidbody2D body = go.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
 
         return go;
     }
@@ -278,31 +280,12 @@ public class ExplosionEffect
 
     public ExplosionEffect(Vector2 explosionPosition)
     {
-        Texture2D textureOutline = Resources.Load<Texture2D>("outline_square");
-        Texture2D textureExplosion = Resources.Load<Texture2D>("blank_circle");
-        Sprite spriteOutline;
-        Sprite spriteCircle;
-        SpriteRenderer renderer;
-
-        explodeCharge = new GameObject("Explosion");
-        explodeCharge.transform.localScale = new Vector3(0.5f, 0.5f, 1);
-        explodeCharge.transform.position = explosionPosition;
-
-        renderer = explodeCharge.AddComponent<SpriteRenderer>();
-        //renderer.color = new Color(0.2f, 0.3f, 0.4f, 0.0f);
-        spriteOutline = Sprite.Create(textureOutline,
-            new UnityEngine.Rect(0.0f, 0.0f, textureOutline.width, textureOutline.height),
-            new Vector2(0.5f, 0.5f), (float)textureOutline.width);
-        renderer.sprite = spriteOutline;
-
-        BoxCollider2D collider = explodeCharge.AddComponent<BoxCollider2D>();
-
-        /*
-        spriteCircle = Sprite.Create(textureExplosion,
-            new UnityEngine.Rect(0.0f, 0.0f, textureExplosion.width, textureExplosion.height),
-            new Vector2(0.5f, 0.5f), (float)textureExplosion.width);
-        renderer.sprite = spriteCircle;
-        */
+        explodeCharge = Utilities.newSpriteGameObject(
+            "Explosion",
+            new Vector3(0.5f, 0.5f, 1),
+            explosionPosition,
+            new Color(1.0f, 0.5f, 0.0f, 1.0f)
+        );
     }
 
     //maybe add another variable to the method that will grab the current explodeCharge's collider component?
