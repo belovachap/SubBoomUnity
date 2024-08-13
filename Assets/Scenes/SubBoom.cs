@@ -7,15 +7,29 @@ using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
 
 static class Utilities {
-    public static GameObject newSpriteGameObject(string name, Vector3 localScale, Vector3 position, Color color) {
+
+    public static Texture2D blankSquareTexture = Resources.Load<Texture2D>("blank_square");
+    public static Texture2D blankCircleTexture = Resources.Load<Texture2D>("blank_circle");
+
+    public static GameObject newSpriteGameObject(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color) {
         GameObject go = new GameObject(name);
         go.transform.localScale = localScale;
         go.transform.position = position;
         SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
-        Texture2D tex = Resources.Load<Texture2D>("blank_square");
-        Sprite sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f,0.0f,tex.width,tex.height), new Vector2(0.5f, 0.5f), (float) tex.width);
+        Sprite sprite = Sprite.Create(
+            texture,
+            new UnityEngine.Rect(0.0f,0.0f,texture.width,texture.height),
+            new Vector2(0.5f, 0.5f),
+            (float) texture.width
+        );
         renderer.sprite = sprite;
         renderer.color = color;
+
+        return go;
+    }
+
+    public static GameObject newSpriteGameObjectWithPhysics(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color) {
+        GameObject go = newSpriteGameObject(name, texture, localScale, position, color);
         Rigidbody2D body = go.AddComponent<Rigidbody2D>();
         body.gravityScale = 0f;
         BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
@@ -23,6 +37,7 @@ static class Utilities {
 
         return go;
     }
+
 }
 
 public class Submarine {
@@ -45,15 +60,16 @@ public class Submarine {
             initialPosition = new Vector3(-12, depth, 0);
         }
 
-        submarine = Utilities.newSpriteGameObject(
+        submarine = Utilities.newSpriteGameObjectWithPhysics(
             "Submarine",
+            Utilities.blankSquareTexture,
             new Vector3(2, 0.5f, 1),
             initialPosition,
             new Color(1.0f, 0.0f, 0.0f, 1.0f)
         );
     }
 
-    public void UpdatePosition(float dt) {
+    public void Update(float dt, List<Bubble> bubbles) {
         Vector3 pos = submarine.transform.position;
         pos.x += dt * velocity;
 
@@ -67,6 +83,41 @@ public class Submarine {
         }
 
         submarine.transform.position = pos;
+
+        // Add a bubble
+        BoxCollider2D collider = submarine.GetComponent<BoxCollider2D>();
+        Vector3 bubblePos = pos;
+        if (velocity > 0) {
+            bubblePos.x -= (collider.bounds.size.x / 2.0f);
+        } else {
+            bubblePos.x += (collider.bounds.size.x / 2.0f);
+        }
+        bubbles.Add(new Bubble(bubblePos));
+    }
+}
+
+public class Bubble {
+    public float timeExisted = 0f;
+    public float timeToExist;
+    public GameObject go;
+
+    public Bubble(Vector2 position) {
+        timeToExist = UnityEngine.Random.Range(1.0f, 2.0f);
+        go = Utilities.newSpriteGameObject(
+            "Bubble",
+            Utilities.blankSquareTexture,
+            new Vector3(0.1f, 0.1f, 1f),
+            position,
+            new Color(0.5f, 0.0f, 1.0f, 0.5f)
+        );
+    }
+
+    public void Update(float dt) {
+        timeExisted += dt;
+        Vector3 pos = go.transform.position;
+        pos.x += UnityEngine.Random.Range(-1f, 1f) * dt;
+        pos.y += UnityEngine.Random.Range(0.0f, 0.5f) * dt;
+        go.transform.position = pos;
     }
 }
 
@@ -81,6 +132,7 @@ public class SubBoom : MonoBehaviour
     List<Submarine> submarines;
     List<DepthCharge> depthCharges;
     List<ExplosionEffect> explosions;
+    List<Bubble> bubbles;
 
     GameObject currentDepthCharge;
 
@@ -93,13 +145,15 @@ public class SubBoom : MonoBehaviour
     {
         ocean = Utilities.newSpriteGameObject(
             "Ocean",
+            Utilities.blankSquareTexture,
             new Vector3(22, 8, 1),
             new Vector3(0, -1, 100),
             new Color(0.0f, 0.0f, 1.0f, 1.0f)
         );
     
-        destroyer = Utilities.newSpriteGameObject(
+        destroyer = Utilities.newSpriteGameObjectWithPhysics(
             "Destroyer",
+            Utilities.blankSquareTexture,
             new Vector3(3, 0.5f, 1),
             new Vector3(0, 3.1f, 0),
             new Color(0.0f, 0.0f, 0.0f, 1.0f)
@@ -110,6 +164,7 @@ public class SubBoom : MonoBehaviour
 
         depthCharges = new List<DepthCharge>();
         explosions = new List<ExplosionEffect>();
+        bubbles = new List<Bubble>();
     }
 
     // Update is called once per frame
@@ -172,7 +227,7 @@ public class SubBoom : MonoBehaviour
 
         // Update submarine positions
         foreach (var sub in submarines) {
-            sub.UpdatePosition(Time.deltaTime);
+            sub.Update(Time.deltaTime, bubbles);
         }
 
         // Add a new submarine if it's been at least 10 seconds
@@ -185,7 +240,7 @@ public class SubBoom : MonoBehaviour
         // Update depth charges, keep track of exploded charges
         List<DepthCharge> explodedCharges = new List<DepthCharge>();
         foreach (var dc in depthCharges) {
-            dc.Update(Time.deltaTime);
+            dc.Update(Time.deltaTime, bubbles);
             if (dc.secondsSinceDropped >= dc.timeUntilExplode) {
                 explodedCharges.Add(dc);
             }
@@ -234,6 +289,21 @@ public class SubBoom : MonoBehaviour
             }
         }
 
+        // Bubbles
+        List<Bubble> expiredBubbles = new List<Bubble>();
+        foreach (var bubble in bubbles) {
+            bubble.Update(Time.deltaTime);
+            if (bubble.timeExisted > bubble.timeToExist
+                || bubble.go.transform.position.y > 2.9) {
+                expiredBubbles.Add(bubble);
+            }
+        }
+
+        foreach (var bubble in expiredBubbles) {
+            Destroy(bubble.go);
+            bubbles.Remove(bubble);
+        }
+
         scoreText.text = "Score: " + score.ToString();
     }
 }
@@ -247,25 +317,26 @@ public class DepthCharge
 
     public DepthCharge(Vector2 destroyerPosition)
     {
-        Texture2D tex = Resources.Load<Texture2D>("blank_circle");
-        Sprite sprite;
-        SpriteRenderer renderer;
-
-        depthCharge = new GameObject("Depth Charge");
-        depthCharge.transform.localScale = new Vector3(0.5f, 0.5f, 1);
-        depthCharge.transform.position = destroyerPosition;
-
-        renderer = depthCharge.AddComponent<SpriteRenderer>();
-        renderer.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        sprite = Sprite.Create(tex, new UnityEngine.Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), (float)tex.width);
-        renderer.sprite = sprite;
+        depthCharge = Utilities.newSpriteGameObject(
+            "Explosion",
+            Utilities.blankCircleTexture,
+            new Vector3(0.5f, 0.5f, 1),
+            destroyerPosition,
+            new Color(0.0f, 0.0f, 0.0f, 1.0f)
+        );
     }
 
-    public void Update(float dt) {
+    public void Update(float dt, List<Bubble> bubbles) {
         secondsSinceDropped += dt;
         Vector2 pos = depthCharge.transform.position;
         pos.y += dt * velocity;
         depthCharge.transform.position = pos;
+
+        // Add a bubble
+        SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
+        Vector2 bubblePos = pos;
+        bubblePos.y += (renderer.bounds.size.y / 2.0f);
+        bubbles.Add(new Bubble(bubblePos));
     }
 }
 
@@ -278,8 +349,9 @@ public class ExplosionEffect
 
     public ExplosionEffect(Vector2 explosionPosition)
     {
-        explodeCharge = Utilities.newSpriteGameObject(
+        explodeCharge = Utilities.newSpriteGameObjectWithPhysics(
             "Explosion",
+            Utilities.blankSquareTexture,
             new Vector3(0.5f, 0.5f, 1),
             explosionPosition,
             new Color(1.0f, 0.5f, 0.0f, 1.0f)
