@@ -5,13 +5,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
+using static UnityEditor.PlayerSettings;
 
 static class Utilities {
 
     public static Texture2D blankSquareTexture = Resources.Load<Texture2D>("blank_square");
     public static Texture2D blankCircleTexture = Resources.Load<Texture2D>("blank_circle");
 
-    public static GameObject newSpriteGameObject(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color) {
+    public static GameObject newSpriteGameObject(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color)
+    {
         GameObject go = new GameObject(name);
         go.transform.localScale = localScale;
         go.transform.position = position;
@@ -28,7 +30,8 @@ static class Utilities {
         return go;
     }
 
-    public static GameObject newSpriteGameObjectWithPhysics(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color) {
+    public static GameObject newSpriteGameObjectWithPhysics(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color)
+    {
         GameObject go = newSpriteGameObject(name, texture, localScale, position, color);
         Rigidbody2D body = go.AddComponent<Rigidbody2D>();
         body.gravityScale = 0f;
@@ -49,14 +52,18 @@ public class Submarine {
 
         velocity = UnityEngine.Random.Range(0.5f, 1.5f);
 
-        if (UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f) {
+        if (UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f)
+        {
             velocity *= -1;
         }
 
         Vector3 initialPosition;
-        if (velocity < 0) {
+        if (velocity < 0)
+        {
             initialPosition = new Vector3(12, depth, 0);
-        } else {
+        }
+        else
+        {
             initialPosition = new Vector3(-12, depth, 0);
         }
 
@@ -69,16 +76,19 @@ public class Submarine {
         );
     }
 
-    public void Update(float dt, List<Bubble> bubbles) {
+    public void Update(float dt, List<Bubble> bubbles)
+    {
         Vector3 pos = submarine.transform.position;
         pos.x += dt * velocity;
 
         // Wrap the subs around if they've wandered off screen
-        if (pos.x < -12) {
+        if (pos.x < -12)
+        {
             pos.x = 12;
         }
 
-        if (pos.x > 12) {
+        if (pos.x > 12)
+        {
             pos.x = -12;
         }
 
@@ -87,12 +97,50 @@ public class Submarine {
         // Add a bubble
         BoxCollider2D collider = submarine.GetComponent<BoxCollider2D>();
         Vector3 bubblePos = pos;
-        if (velocity > 0) {
+        if (velocity > 0)
+        {
             bubblePos.x -= (collider.bounds.size.x / 2.0f);
-        } else {
+        }
+        else
+        {
             bubblePos.x += (collider.bounds.size.x / 2.0f);
         }
         bubbles.Add(new Bubble(bubblePos));
+
+        //add torpedo
+    }
+}
+
+public class Torpedo
+{
+    public float timeExisted = 0;
+    public float timeToExist;
+    public GameObject torpedo;
+
+    public Torpedo(Vector2 submarinePosition)
+    {
+        torpedo = Utilities.newSpriteGameObject
+        (
+            "Torpedo",
+            Utilities.blankSquareTexture,
+            new Vector3(0.1f, 0.1f, 1),
+            submarinePosition,
+            new Color(1, 0, 0, 1)
+        );
+    }
+
+    public void UpdateMovement(float duration, Vector2 destroyerPosition, List<Bubble> bubbles)
+    {
+        timeExisted += duration;
+        Vector3 torpedoMovement = torpedo.transform.position;
+        torpedoMovement.x = destroyerPosition.x * duration;
+        torpedoMovement.y = destroyerPosition.y * duration;
+        torpedo.transform.position = torpedoMovement;
+
+        SpriteRenderer renderer = torpedo.GetComponent<SpriteRenderer>();
+        Vector2 bubblePosition = torpedoMovement;
+        bubblePosition.y += (renderer.bounds.size.y / 2.0f);
+        bubbles.Add(new Bubble(bubblePosition));
     }
 }
 
@@ -101,18 +149,21 @@ public class Bubble {
     public float timeToExist;
     public GameObject go;
 
-    public Bubble(Vector2 position) {
+    public Bubble(Vector2 position)
+    {
         timeToExist = UnityEngine.Random.Range(1.0f, 2.0f);
-        go = Utilities.newSpriteGameObject(
+        go = Utilities.newSpriteGameObject
+        (
             "Bubble",
-            Utilities.blankSquareTexture,
+            Utilities.blankCircleTexture,
             new Vector3(0.1f, 0.1f, 1f),
             position,
             new Color(0.5f, 0.0f, 1.0f, 0.5f)
         );
     }
 
-    public void Update(float dt) {
+    public void UpdateMovement(float dt)
+    {
         timeExisted += dt;
         Vector3 pos = go.transform.position;
         pos.x += UnityEngine.Random.Range(-1f, 1f) * dt;
@@ -132,6 +183,7 @@ public class SubBoom : MonoBehaviour
     List<Submarine> submarines;
     List<DepthCharge> depthCharges;
     List<ExplosionEffect> explosions;
+    List<Torpedo> torpedos;
     List<Bubble> bubbles;
 
     GameObject currentDepthCharge;
@@ -140,10 +192,14 @@ public class SubBoom : MonoBehaviour
     float timeSinceSubAdded = 0.0f;
     ulong score = 0;
 
+    float torpedoSpawnTime = 0;
+    float torpedoTimeUntilLaunch = 0;
+
     // Start is called before the first frame update
     void Start()
     {
-        ocean = Utilities.newSpriteGameObject(
+        ocean = Utilities.newSpriteGameObject
+        (
             "Ocean",
             Utilities.blankSquareTexture,
             new Vector3(22, 8, 1),
@@ -151,7 +207,8 @@ public class SubBoom : MonoBehaviour
             new Color(0.0f, 0.0f, 1.0f, 1.0f)
         );
     
-        destroyer = Utilities.newSpriteGameObjectWithPhysics(
+        destroyer = Utilities.newSpriteGameObjectWithPhysics
+        (
             "Destroyer",
             Utilities.blankSquareTexture,
             new Vector3(3, 0.5f, 1),
@@ -164,7 +221,10 @@ public class SubBoom : MonoBehaviour
 
         depthCharges = new List<DepthCharge>();
         explosions = new List<ExplosionEffect>();
+        torpedos = new List<Torpedo>();
         bubbles = new List<Bubble>();
+
+        torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
     }
 
     // Update is called once per frame
@@ -198,7 +258,6 @@ public class SubBoom : MonoBehaviour
             pos.x -= Time.deltaTime * 3;
             pos.x = Mathf.Max(pos.x, -9.25f);
             destroyer.transform.position = pos;
-            score += 1;
         }
 
         if (Input.GetKey("right"))
@@ -206,17 +265,18 @@ public class SubBoom : MonoBehaviour
             pos.x += Time.deltaTime * 3;
             pos.x = Mathf.Min(pos.x, 9.25f);
             destroyer.transform.position = pos;
-            score += 1;
         }
 
-        if (Input.GetKey("escape")) {
+        if (Input.GetKey("escape"))
+        {
             GameData gd = GameDataFileHandler.Load();
             DateTime now = DateTime.Now;
             gd.totalGamesPlayed += 1;
             gd.totalSecondsPlayed += (ulong)timePlayed;
             gd.lastScore = (ulong)score;
             gd.lastScoreDateTime = now.ToString();
-            if (score >= gd.highScore) {
+            if (score >= gd.highScore)
+            {
                 gd.highScore = score;
                 gd.highScoreDateTime = now.ToString();
             }
@@ -226,32 +286,53 @@ public class SubBoom : MonoBehaviour
         }
 
         // Update submarine positions
-        foreach (var sub in submarines) {
+        foreach (var sub in submarines)
+        {
             sub.Update(Time.deltaTime, bubbles);
+            
+            torpedoTimeUntilLaunch += Time.deltaTime;
+            if (torpedoTimeUntilLaunch == torpedoSpawnTime)
+            {
+                torpedos.Add(new Torpedo(sub.submarine.transform.position));
+                foreach (var torp in torpedos)
+                {
+                    torp.UpdateMovement(Time.deltaTime, pos, bubbles);
+                }
+
+                torpedoTimeUntilLaunch = 0;
+                torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
+            }
+
         }
 
         // Add a new submarine if it's been at least 10 seconds
         timeSinceSubAdded += Time.deltaTime;
-        if (timeSinceSubAdded > 10) {
+        if (timeSinceSubAdded > 10)
+        {
             timeSinceSubAdded = 0.0f;
             submarines.Add(new Submarine());
         }
 
         // Update depth charges, keep track of exploded charges
         List<DepthCharge> explodedCharges = new List<DepthCharge>();
-        foreach (var dc in depthCharges) {
-            dc.Update(Time.deltaTime, bubbles);
-            if (dc.secondsSinceDropped >= dc.timeUntilExplode) {
+        foreach (var dc in depthCharges)
+        {
+            dc.UpdateMovement(Time.deltaTime, bubbles);
+            if (dc.secondsSinceDropped >= dc.timeUntilExplode)
+            {
                 explodedCharges.Add(dc);
             }
         }
 
         // Clear exploded depth charges
         // TODO: create an explosion object in its place
-        foreach (var dc in explodedCharges) {
-            explosions.Add(new ExplosionEffect(new Vector2(
+        foreach (var dc in explodedCharges)
+        {
+            explosions.Add(new ExplosionEffect(new Vector2
+            (
                 dc.depthCharge.transform.position.x,
-                dc.depthCharge.transform.position.y)));
+                dc.depthCharge.transform.position.y))
+            );
 
             Destroy(dc.depthCharge);
             depthCharges.Remove(dc);
@@ -267,39 +348,40 @@ public class SubBoom : MonoBehaviour
                 explosions.Remove(ec);
                 break;
             }
-            ec.Update(Time.deltaTime);
+            ec.UpdateMovement(Time.deltaTime);
         }
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
         //if so, destroy submarine and/or if destroyer, game over
-
-        //update: it may be easier to try the method OnCollisionEnter2D
-        //if we are able to get both box colliders somehow
         foreach (var ec in explosions)
         {
             foreach (var sub in submarines)
             {
-                //this isn't working for some reason? not even the debug message is showing up.
+                //getting an error here ("enumeration operation may not execute"
                 if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching(sub.submarine.GetComponent<BoxCollider2D>()) == true)
                 {
-                    Debug.Log("This works!");
                     Destroy(sub.submarine);
                     submarines.Remove(sub);
+
+                    score += 1;
                 }
             }
         }
 
         // Bubbles
         List<Bubble> expiredBubbles = new List<Bubble>();
-        foreach (var bubble in bubbles) {
-            bubble.Update(Time.deltaTime);
-            if (bubble.timeExisted > bubble.timeToExist
-                || bubble.go.transform.position.y > 2.9) {
+        foreach (var bubble in bubbles)
+        {
+            bubble.UpdateMovement(Time.deltaTime);
+            if (bubble.timeExisted > bubble.timeToExist ||
+                bubble.go.transform.position.y > 2.9)
+            {
                 expiredBubbles.Add(bubble);
             }
         }
 
-        foreach (var bubble in expiredBubbles) {
+        foreach (var bubble in expiredBubbles)
+        {
             Destroy(bubble.go);
             bubbles.Remove(bubble);
         }
@@ -317,7 +399,8 @@ public class DepthCharge
 
     public DepthCharge(Vector2 destroyerPosition)
     {
-        depthCharge = Utilities.newSpriteGameObject(
+        depthCharge = Utilities.newSpriteGameObject
+        (
             "Explosion",
             Utilities.blankCircleTexture,
             new Vector3(0.5f, 0.5f, 1),
@@ -326,7 +409,8 @@ public class DepthCharge
         );
     }
 
-    public void Update(float dt, List<Bubble> bubbles) {
+    public void UpdateMovement(float dt, List<Bubble> bubbles)
+    {
         secondsSinceDropped += dt;
         Vector2 pos = depthCharge.transform.position;
         pos.y += dt * velocity;
@@ -349,7 +433,8 @@ public class ExplosionEffect
 
     public ExplosionEffect(Vector2 explosionPosition)
     {
-        explodeCharge = Utilities.newSpriteGameObjectWithPhysics(
+        explodeCharge = Utilities.newSpriteGameObjectWithPhysics
+        (
             "Explosion",
             Utilities.blankSquareTexture,
             new Vector3(0.5f, 0.5f, 1),
@@ -359,7 +444,7 @@ public class ExplosionEffect
     }
 
     //maybe add another variable to the method that will grab the current explodeCharge's collider component?
-    public void Update(float explosionDuration)
+    public void UpdateMovement(float explosionDuration)
     {
         secondsSinceDropped += explosionDuration;
         explodeCharge.transform.localScale += new Vector3 (explosionDuration, explosionDuration, 0);
