@@ -301,7 +301,7 @@ public class SubBoom : MonoBehaviour
             sub.UpdateMovement(Time.deltaTime, bubbles);
 
             torpedoTimeUntilLaunch += Time.deltaTime;
-            if (torpedoTimeUntilLaunch == torpedoSpawnTime)
+            if (torpedoTimeUntilLaunch >= torpedoSpawnTime)
             {
                 torpedos.Add(new Torpedo(sub.submarine.transform.position));
                 foreach (var torp in torpedos)
