@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
-using static UnityEditor.PlayerSettings;
 
-static class Utilities {
+static class Utilities
+{
 
     public static Texture2D blankSquareTexture = Resources.Load<Texture2D>("blank_square");
     public static Texture2D blankCircleTexture = Resources.Load<Texture2D>("blank_circle");
@@ -17,15 +17,19 @@ static class Utilities {
         GameObject go = new GameObject(name);
         go.transform.localScale = localScale;
         go.transform.position = position;
+
         SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
-        Sprite sprite = Sprite.Create(
+        Sprite sprite = Sprite.Create
+        (
             texture,
             new UnityEngine.Rect(0.0f,0.0f,texture.width,texture.height),
             new Vector2(0.5f, 0.5f),
             (float) texture.width
         );
+
         renderer.sprite = sprite;
         renderer.color = color;
+        go.AddComponent<AudioSource>();
 
         return go;
     }
@@ -33,8 +37,10 @@ static class Utilities {
     public static GameObject newSpriteGameObjectWithPhysics(string name, Texture2D texture, Vector3 localScale, Vector3 position, Color color)
     {
         GameObject go = newSpriteGameObject(name, texture, localScale, position, color);
+
         Rigidbody2D body = go.AddComponent<Rigidbody2D>();
         body.gravityScale = 0f;
+
         BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
         collider.isTrigger = true;
 
@@ -43,11 +49,13 @@ static class Utilities {
 
 }
 
-public class Submarine {
+public class Submarine
+{
     float velocity;
     public GameObject submarine;
 
-    public Submarine() {
+    public Submarine()
+    {
         float depth = UnityEngine.Random.Range(-4.5f, 2);
 
         velocity = UnityEngine.Random.Range(0.5f, 1.5f);
@@ -67,16 +75,22 @@ public class Submarine {
             initialPosition = new Vector3(-12, depth, 0);
         }
 
-        submarine = Utilities.newSpriteGameObjectWithPhysics(
+        submarine = Utilities.newSpriteGameObjectWithPhysics
+        (
             "Submarine",
             Utilities.blankSquareTexture,
             new Vector3(2, 0.5f, 1),
             initialPosition,
             new Color(1.0f, 0.0f, 0.0f, 1.0f)
         );
+
+        // Play sonar sound to introduce new submarine
+        AudioSource audio = submarine.GetComponent<AudioSource>();
+        AudioClip sonar = Resources.Load<AudioClip>("submarine_sonar");
+        audio.PlayOneShot(sonar);
     }
 
-    public void Update(float dt, List<Bubble> bubbles)
+    public void UpdateMovement(float dt, List<Bubble> bubbles)
     {
         Vector3 pos = submarine.transform.position;
         pos.x += dt * velocity;
@@ -106,8 +120,35 @@ public class Submarine {
             bubblePos.x += (collider.bounds.size.x / 2.0f);
         }
         bubbles.Add(new Bubble(bubblePos));
+    }
+}
 
-        //add torpedo
+public class Bubble
+{
+    public float timeExisted = 0f;
+    public float timeToExist;
+    public GameObject go;
+
+    public Bubble(Vector2 position)
+    {
+        timeToExist = UnityEngine.Random.Range(1.0f, 2.0f);
+        go = Utilities.newSpriteGameObject
+        (
+            "Bubble",
+            Utilities.blankSquareTexture,
+            new Vector3(0.1f, 0.1f, 1f),
+            position,
+            new Color(0.5f, 0.0f, 1.0f, 0.5f)
+        );
+    }
+
+    public void UpdateMovement(float dt)
+    {
+        timeExisted += dt;
+        Vector3 pos = go.transform.position;
+        pos.x += UnityEngine.Random.Range(-1f, 1f) * dt;
+        pos.y += UnityEngine.Random.Range(0.0f, 0.5f) * dt;
+        go.transform.position = pos;
     }
 }
 
@@ -144,34 +185,6 @@ public class Torpedo
     }
 }
 
-public class Bubble {
-    public float timeExisted = 0f;
-    public float timeToExist;
-    public GameObject go;
-
-    public Bubble(Vector2 position)
-    {
-        timeToExist = UnityEngine.Random.Range(1.0f, 2.0f);
-        go = Utilities.newSpriteGameObject
-        (
-            "Bubble",
-            Utilities.blankCircleTexture,
-            new Vector3(0.1f, 0.1f, 1f),
-            position,
-            new Color(0.5f, 0.0f, 1.0f, 0.5f)
-        );
-    }
-
-    public void UpdateMovement(float dt)
-    {
-        timeExisted += dt;
-        Vector3 pos = go.transform.position;
-        pos.x += UnityEngine.Random.Range(-1f, 1f) * dt;
-        pos.y += UnityEngine.Random.Range(0.0f, 0.5f) * dt;
-        go.transform.position = pos;
-    }
-}
-
 public class SubBoom : MonoBehaviour
 {
     [SerializeField]
@@ -192,8 +205,8 @@ public class SubBoom : MonoBehaviour
     float timeSinceSubAdded = 0.0f;
     ulong score = 0;
 
-    float torpedoSpawnTime = 0;
-    float torpedoTimeUntilLaunch = 0;
+    float torpedoSpawnTime;
+    float torpedoTimeUntilLaunch;
 
     // Start is called before the first frame update
     void Start()
@@ -218,13 +231,10 @@ public class SubBoom : MonoBehaviour
 
         submarines = new List<Submarine>();
         submarines.Add(new Submarine());
-
         depthCharges = new List<DepthCharge>();
         explosions = new List<ExplosionEffect>();
         torpedos = new List<Torpedo>();
         bubbles = new List<Bubble>();
-
-        torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
     }
 
     // Update is called once per frame
@@ -288,8 +298,8 @@ public class SubBoom : MonoBehaviour
         // Update submarine positions
         foreach (var sub in submarines)
         {
-            sub.Update(Time.deltaTime, bubbles);
-            
+            sub.UpdateMovement(Time.deltaTime, bubbles);
+
             torpedoTimeUntilLaunch += Time.deltaTime;
             if (torpedoTimeUntilLaunch == torpedoSpawnTime)
             {
@@ -302,7 +312,6 @@ public class SubBoom : MonoBehaviour
                 torpedoTimeUntilLaunch = 0;
                 torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
             }
-
         }
 
         // Add a new submarine if it's been at least 10 seconds
@@ -353,13 +362,19 @@ public class SubBoom : MonoBehaviour
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
         //if so, destroy submarine and/or if destroyer, game over
+
+        //update: it may be easier to try the method OnCollisionEnter2D
+        //if we are able to get both box colliders somehow
         foreach (var ec in explosions)
         {
             foreach (var sub in submarines)
             {
-                //getting an error here ("enumeration operation may not execute"
-                if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching(sub.submarine.GetComponent<BoxCollider2D>()) == true)
+                //this isn't working for some reason? not even the debug message is showing up.
+                if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching
+                   (sub.submarine.GetComponent<BoxCollider2D>()) == true)
                 {
+                    Debug.Log("This works!");
+
                     Destroy(sub.submarine);
                     submarines.Remove(sub);
 
@@ -370,11 +385,11 @@ public class SubBoom : MonoBehaviour
 
         // Bubbles
         List<Bubble> expiredBubbles = new List<Bubble>();
-        foreach (var bubble in bubbles)
+        foreach (var bubble in bubbles) 
         {
             bubble.UpdateMovement(Time.deltaTime);
             if (bubble.timeExisted > bubble.timeToExist ||
-                bubble.go.transform.position.y > 2.9)
+                bubble.go.transform.position.y > 2.9) 
             {
                 expiredBubbles.Add(bubble);
             }
@@ -407,6 +422,11 @@ public class DepthCharge
             destroyerPosition,
             new Color(0.0f, 0.0f, 0.0f, 1.0f)
         );
+
+        // Play depth charge drop sound!
+        AudioSource audio = depthCharge.GetComponent<AudioSource>();
+        AudioClip sound = Resources.Load<AudioClip>("depth_charge_drop");
+        audio.PlayOneShot(sound);
     }
 
     public void UpdateMovement(float dt, List<Bubble> bubbles)
@@ -441,6 +461,20 @@ public class ExplosionEffect
             explosionPosition,
             new Color(1.0f, 0.5f, 0.0f, 1.0f)
         );
+
+        // Play an explosion sound!
+        string[] explosionSounds =
+        {
+            "dynamite1",
+            "dynamite2",
+            "dynamite3",
+            "dynamite4",
+            "dynamite5"
+        };
+
+        AudioSource audio = explodeCharge.GetComponent<AudioSource>();
+        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 6)]);
+        audio.PlayOneShot(sound);
     }
 
     //maybe add another variable to the method that will grab the current explodeCharge's collider component?
