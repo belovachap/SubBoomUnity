@@ -24,6 +24,7 @@ static class Utilities {
         );
         renderer.sprite = sprite;
         renderer.color = color;
+        go.AddComponent<AudioSource>();
 
         return go;
     }
@@ -67,6 +68,11 @@ public class Submarine {
             initialPosition,
             new Color(1.0f, 0.0f, 0.0f, 1.0f)
         );
+
+        // Play sonar sound to introduce new submarine
+        AudioSource audio = submarine.GetComponent<AudioSource>();
+        AudioClip sonar = Resources.Load<AudioClip>("submarine_sonar");
+        audio.PlayOneShot(sonar);
     }
 
     public void Update(float dt, List<Bubble> bubbles) {
@@ -161,7 +167,6 @@ public class SubBoom : MonoBehaviour
 
         submarines = new List<Submarine>();
         submarines.Add(new Submarine());
-
         depthCharges = new List<DepthCharge>();
         explosions = new List<ExplosionEffect>();
         bubbles = new List<Bubble>();
@@ -324,6 +329,11 @@ public class DepthCharge
             destroyerPosition,
             new Color(0.0f, 0.0f, 0.0f, 1.0f)
         );
+
+        // Play depth charge drop sound!
+        AudioSource audio = depthCharge.GetComponent<AudioSource>();
+        AudioClip sound = Resources.Load<AudioClip>("depth_charge_drop");
+        audio.PlayOneShot(sound);
     }
 
     public void Update(float dt, List<Bubble> bubbles) {
@@ -356,6 +366,18 @@ public class ExplosionEffect
             explosionPosition,
             new Color(1.0f, 0.5f, 0.0f, 1.0f)
         );
+
+        // Play an explosion sound!
+        string[] explosionSounds = {
+            "dynamite1",
+            "dynamite2",
+            "dynamite3",
+            "dynamite4",
+            "dynamite5"
+        };
+        AudioSource audio = explodeCharge.GetComponent<AudioSource>();
+        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 6)]);
+        audio.PlayOneShot(sound);
     }
 
     //maybe add another variable to the method that will grab the current explodeCharge's collider component?
