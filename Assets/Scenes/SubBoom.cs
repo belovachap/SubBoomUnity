@@ -154,8 +154,6 @@ public class Bubble
 
 public class Torpedo
 {
-    public float timeExisted = 0;
-    public float timeToExist;
     public GameObject torpedo;
 
     public Torpedo(Vector2 submarinePosition)
@@ -166,21 +164,19 @@ public class Torpedo
             Utilities.blankSquareTexture,
             new Vector3(0.1f, 0.1f, 1),
             submarinePosition,
-            new Color(1, 0, 0, 1)
+            new Color(0, 1, 0, 1)
         );
     }
 
-    public void UpdateMovement(float duration, Vector2 destroyerPosition, List<Bubble> bubbles)
+    public void UpdateMovement(float duration, List<Bubble> bubbles)
     {
-        timeExisted += duration;
         Vector3 torpedoMovement = torpedo.transform.position;
-        torpedoMovement.x = destroyerPosition.x * duration;
-        torpedoMovement.y = destroyerPosition.y * duration;
+        torpedoMovement.y += 2.0f * duration;
         torpedo.transform.position = torpedoMovement;
 
         SpriteRenderer renderer = torpedo.GetComponent<SpriteRenderer>();
         Vector2 bubblePosition = torpedoMovement;
-        bubblePosition.y += (renderer.bounds.size.y / 2.0f);
+        bubblePosition.y -= (renderer.bounds.size.y / 2.0f);
         bubbles.Add(new Bubble(bubblePosition));
     }
 }
@@ -295,23 +291,30 @@ public class SubBoom : MonoBehaviour
             SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
         }
 
+        // Update torpedos
+        torpedoTimeUntilLaunch += Time.deltaTime;
+        foreach (var torp in torpedos)
+        {
+            torp.UpdateMovement(Time.deltaTime, bubbles);
+        }
+
         // Update submarine positions
         foreach (var sub in submarines)
         {
             sub.UpdateMovement(Time.deltaTime, bubbles);
 
-            torpedoTimeUntilLaunch += Time.deltaTime;
+            // All subs shoot a torpedo if it's torpedo time
             if (torpedoTimeUntilLaunch >= torpedoSpawnTime)
             {
                 torpedos.Add(new Torpedo(sub.submarine.transform.position));
-                foreach (var torp in torpedos)
-                {
-                    torp.UpdateMovement(Time.deltaTime, pos, bubbles);
-                }
-
-                torpedoTimeUntilLaunch = 0;
-                torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
             }
+        }
+
+        // Reset torpedo spawn
+        if (torpedoTimeUntilLaunch >= torpedoSpawnTime)
+        {
+            torpedoTimeUntilLaunch = 0;
+            torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
         }
 
         // Add a new submarine if it's been at least 10 seconds
