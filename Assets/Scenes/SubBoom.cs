@@ -362,25 +362,24 @@ public class SubBoom : MonoBehaviour
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
         //if so, destroy submarine and/or if destroyer, game over
-
-        //update: it may be easier to try the method OnCollisionEnter2D
-        //if we are able to get both box colliders somehow
+        HashSet<Submarine> deadSubmarines = new HashSet<Submarine>();
         foreach (var ec in explosions)
         {
             foreach (var sub in submarines)
             {
-                //this isn't working for some reason? not even the debug message is showing up.
                 if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching
-                   (sub.submarine.GetComponent<BoxCollider2D>()) == true)
+                   (sub.submarine.GetComponent<BoxCollider2D>()))
                 {
-                    Debug.Log("This works!");
-
-                    Destroy(sub.submarine);
-                    submarines.Remove(sub);
-
-                    score += 1;
+                    deadSubmarines.Add(sub);
                 }
             }
+        }
+
+        foreach (var sub in deadSubmarines)
+        {
+            Destroy(sub.submarine);
+            submarines.Remove(sub);
+            score += 1;
         }
 
         // Bubbles
