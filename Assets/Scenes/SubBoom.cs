@@ -198,6 +198,8 @@ public class SubBoom : MonoBehaviour
     GameObject ocean;
     GameObject destroyer;
 
+    MainMenu mainMenuScript;
+
     List<Submarine> submarines;
     List<DepthCharge> depthCharges;
     List<ExplosionEffect> explosions;
@@ -209,6 +211,9 @@ public class SubBoom : MonoBehaviour
     float timePlayed = 0.0f;
     float timeSinceSubAdded = 0.0f;
     ulong score = 0;
+
+    public GameObject gameOverScreen;
+    public bool isGameActive = false;
 
     // Start is called before the first frame update
     void Start()
@@ -233,10 +238,14 @@ public class SubBoom : MonoBehaviour
 
         submarines = new List<Submarine>();
         submarines.Add(new Submarine());
+
         depthCharges = new List<DepthCharge>();
         explosions = new List<ExplosionEffect>();
         torpedos = new List<Torpedo>();
         bubbles = new List<Bubble>();
+
+        isGameActive = true;
+        gameOverScreen.SetActive(false);
     }
 
     // Update is called once per frame
@@ -246,55 +255,59 @@ public class SubBoom : MonoBehaviour
 
         Vector2 pos = destroyer.transform.position;
 
-        // Handle user input
-        if (Input.GetKeyDown("space"))
+        //while the game is active, the player can interact using the destroyer
+        while (isGameActive == true)
         {
-            depthCharges.Add(new DepthCharge(pos));
-        }
-
-        if (Input.GetKey("space") && depthCharges.Count > 0)
-        {
-            //depthCharge moves downward until space key is released 
-            //depthCharges[index].transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
-            //int chargeIndex = depthCharges.IndexOf(pos);
-        }
-
-        if (Input.GetKeyUp("space") && depthCharges.Count > 0)
-        {
-            //call ExplodeCharge() method
-            //clear depthCharges List and currentDepthCharge
-        }
-
-        if (Input.GetKey("left"))
-        {
-            pos.x -= Time.deltaTime * 3;
-            pos.x = Mathf.Max(pos.x, -9.25f);
-            destroyer.transform.position = pos;
-        }
-
-        if (Input.GetKey("right"))
-        {
-            pos.x += Time.deltaTime * 3;
-            pos.x = Mathf.Min(pos.x, 9.25f);
-            destroyer.transform.position = pos;
-        }
-
-        if (Input.GetKey("escape"))
-        {
-            GameData gd = GameDataFileHandler.Load();
-            DateTime now = DateTime.Now;
-            gd.totalGamesPlayed += 1;
-            gd.totalSecondsPlayed += (ulong)timePlayed;
-            gd.lastScore = (ulong)score;
-            gd.lastScoreDateTime = now.ToString();
-            if (score >= gd.highScore)
+            // Handle user input
+            if (Input.GetKeyDown("space"))
             {
-                gd.highScore = score;
-                gd.highScoreDateTime = now.ToString();
+                depthCharges.Add(new DepthCharge(pos));
             }
-            GameDataFileHandler.Save(gd);
 
-            SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
+            if (Input.GetKey("space") && depthCharges.Count > 0)
+            {
+                //depthCharge moves downward until space key is released 
+                //depthCharges[index].transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
+                //int chargeIndex = depthCharges.IndexOf(pos);
+            }
+
+            if (Input.GetKeyUp("space") && depthCharges.Count > 0)
+            {
+                //call ExplodeCharge() method
+                //clear depthCharges List and currentDepthCharge
+            }
+
+            if (Input.GetKey("left"))
+            {
+                pos.x -= Time.deltaTime * 3;
+                pos.x = Mathf.Max(pos.x, -9.25f);
+                destroyer.transform.position = pos;
+            }
+
+            if (Input.GetKey("right"))
+            {
+                pos.x += Time.deltaTime * 3;
+                pos.x = Mathf.Min(pos.x, 9.25f);
+                destroyer.transform.position = pos;
+            }
+
+            if (Input.GetKey("escape"))
+            {
+                GameData gd = GameDataFileHandler.Load();
+                DateTime now = DateTime.Now;
+                gd.totalGamesPlayed += 1;
+                gd.totalSecondsPlayed += (ulong)timePlayed;
+                gd.lastScore = (ulong)score;
+                gd.lastScoreDateTime = now.ToString();
+                if (score >= gd.highScore)
+                {
+                    gd.highScore = score;
+                    gd.highScoreDateTime = now.ToString();
+                }
+                GameDataFileHandler.Save(gd);
+
+                SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
+            }
         }
 
         // Update torpedos
@@ -368,46 +381,57 @@ public class SubBoom : MonoBehaviour
 
         // Create a foreach loop for the explosions list
         // That increases the scale of the explosion effect for a specified duration
-        List<ExplosionEffect> deadExplosions = new List<ExplosionEffect>();
         foreach (var ec in explosions)
         {
-            ec.UpdateMovement(Time.deltaTime);
             if (ec.secondsSinceDropped >= ec.timeUntilExplode)
             {
-                deadExplosions.Add(ec);
+                Destroy(ec.explodeCharge);
+                explosions.Remove(ec);
+                break;
             }
-        }
-
-        foreach (var ec in deadExplosions)
-        {
-            Destroy(ec.explodeCharge);
-            explosions.Remove(ec);
+            ec.UpdateMovement(Time.deltaTime);
         }
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
         //if so, destroy submarine and/or if destroyer, game over
-        HashSet<Submarine> deadSubmarines = new HashSet<Submarine>();
+
+        //update: it may be easier to try the method OnCollisionEnter2D
+        //if we are able to get both box colliders somehow
         foreach (var ec in explosions)
         {
             foreach (var sub in submarines)
             {
+                //this isn't working for some reason? not even the debug message is showing up.
                 if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching
-                   (sub.submarine.GetComponent<BoxCollider2D>()))
+                   (sub.submarine.GetComponent<BoxCollider2D>()) == true)
                 {
-                    deadSubmarines.Add(sub);
+                    Debug.Log("This works!");
+
+                    Destroy(sub.submarine);
+                    submarines.Remove(sub);
+
+                    score += 1;
                 }
+            }
+
+            if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching(destroyer.GetComponent<BoxCollider2D>()))
+            {
+                destroyer.SetActive(false);
             }
         }
 
-        foreach (var sub in deadSubmarines)
+        //instead of destroying the player object, we can deactivate it instead
+        //that way, the game can be optimized a little bit
+        /*
+        if (destroyer.activeInHierarchy == false)
         {
-            Destroy(sub.submarine);
-            submarines.Remove(sub);
-            score += 1;
+            isGameActive = false;
+            gameOverScreen.SetActive(true);
         }
+        */
 
-        // Bubbles
-        List<Bubble> expiredBubbles = new List<Bubble>();
+            // Bubbles
+            List<Bubble> expiredBubbles = new List<Bubble>();
         foreach (var bubble in bubbles) 
         {
             bubble.UpdateMovement(Time.deltaTime);
@@ -426,6 +450,11 @@ public class SubBoom : MonoBehaviour
 
         scoreText.text = "Score: " + score.ToString();
     }
+
+    public void GameOverClick()
+    {
+        gameOverScreen.SetActive(true);
+    }
 }
 
 public class DepthCharge
@@ -439,7 +468,7 @@ public class DepthCharge
     {
         depthCharge = Utilities.newSpriteGameObject
         (
-            "Explosion",
+            "Depth Charge",
             Utilities.blankCircleTexture,
             new Vector3(0.5f, 0.5f, 1),
             destroyerPosition,
@@ -496,7 +525,7 @@ public class ExplosionEffect
         };
 
         AudioSource audio = explodeCharge.GetComponent<AudioSource>();
-        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 5)]);
+        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 6)]);
         audio.PlayOneShot(sound);
     }
 
