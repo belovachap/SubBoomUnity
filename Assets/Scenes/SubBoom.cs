@@ -349,15 +349,20 @@ public class SubBoom : MonoBehaviour
 
         // Create a foreach loop for the explosions list
         // That increases the scale of the explosion effect for a specified duration
+        List<ExplosionEffect> deadExplosions = new List<ExplosionEffect>();
         foreach (var ec in explosions)
         {
+            ec.UpdateMovement(Time.deltaTime);
             if (ec.secondsSinceDropped >= ec.timeUntilExplode)
             {
-                Destroy(ec.explodeCharge);
-                explosions.Remove(ec);
-                break;
+                deadExplosions.Add(ec);
             }
-            ec.UpdateMovement(Time.deltaTime);
+        }
+
+        foreach (var ec in deadExplosions)
+        {
+            Destroy(ec.explodeCharge);
+            explosions.Remove(ec);
         }
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
@@ -472,7 +477,7 @@ public class ExplosionEffect
         };
 
         AudioSource audio = explodeCharge.GetComponent<AudioSource>();
-        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 6)]);
+        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 5)]);
         audio.PlayOneShot(sound);
     }
 
