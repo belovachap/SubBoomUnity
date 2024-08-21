@@ -18,44 +18,37 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     Text highScoreText;
 
-    [SerializeField]
-    RawImage artworkRawImage;
-
-    public void Start() {
+    public void Start()
+    {
         GameData gd = GameDataFileHandler.Load();
 
         gamesPlayedText.text = "Games Played: " + gd.totalGamesPlayed.ToString();
         secondsPlayedText.text = "Seconds Played: " + gd.totalSecondsPlayed.ToString();
 
-        if (gd.lastScoreDateTime == "") {
+        if (gd.lastScoreDateTime == "")
+        {
             lastScoreText.text = "";
         }
-        else {
+        else
+        {
             lastScoreText.text = "Last Score: " + gd.lastScore.ToString() + " on " + gd.lastScoreDateTime;
         }
 
-        if (gd.highScoreDateTime == "") {
+        if (gd.highScoreDateTime == "")
+        {
             highScoreText.text = "";
         }
-        else {
+        else
+        {
             highScoreText.text = "High Score: " + gd.highScore.ToString() + " on " + gd.highScoreDateTime;
         }
-
-        string[] artwork = {
-            "sub_boom_art_one",
-            "sub_boom_art_two",
-            "sub_boom_art_three",
-            "sub_boom_art_four"
-        };
-        artworkRawImage.texture = Resources.Load<Texture2D>(artwork[Random.Range(0, 4)]);
     }
 
-    public void QuitButtonClick ()
+    public void QuitButtonClick()
     {
         Application.Quit();
     }
-
-    public void StartButtonClick ()
+    public void StartButtonClick()
     {
         SceneManager.LoadScene("SubBoomScene", LoadSceneMode.Single);
     }
