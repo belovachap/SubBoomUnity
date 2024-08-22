@@ -52,6 +52,8 @@ static class Utilities
 public class Submarine
 {
     float velocity;
+    public float timeSinceLastTorpedo = 0f;
+    public float timeUntilNextTorpedo;
     public GameObject submarine;
 
     public Submarine()
@@ -59,6 +61,8 @@ public class Submarine
         float depth = UnityEngine.Random.Range(-4.5f, 2);
 
         velocity = UnityEngine.Random.Range(0.5f, 1.5f);
+
+        timeUntilNextTorpedo = UnityEngine.Random.Range(5.0f, 10.0f);
 
         if (UnityEngine.Random.Range(0.0f, 1.0f) >= 0.5f)
         {
@@ -92,6 +96,7 @@ public class Submarine
 
     public void UpdateMovement(float dt, List<Bubble> bubbles)
     {
+        timeSinceLastTorpedo += dt;
         Vector3 pos = submarine.transform.position;
         pos.x += dt * velocity;
 
@@ -154,12 +159,13 @@ public class Bubble
 
 public class Torpedo
 {
-    public float timeExisted = 0;
-    public float timeToExist;
+    public Vector2 direction;
     public GameObject torpedo;
 
-    public Torpedo(Vector2 submarinePosition)
+    public Torpedo(Vector2 submarinePosition, Vector2 destroyerPosition)
     {
+        direction = destroyerPosition - submarinePosition;
+        direction.Normalize();
         torpedo = Utilities.newSpriteGameObject
         (
             "Torpedo",
@@ -170,17 +176,16 @@ public class Torpedo
         );
     }
 
-    public void UpdateMovement(float duration, Vector2 destroyerPosition, List<Bubble> bubbles)
+    public void UpdateMovement(float duration, List<Bubble> bubbles)
     {
-        timeExisted += duration;
         Vector3 torpedoMovement = torpedo.transform.position;
-        torpedoMovement.x = destroyerPosition.x * duration;
-        torpedoMovement.y = destroyerPosition.y * duration;
+        torpedoMovement.x += direction.x * 2 * duration;
+        torpedoMovement.y += direction.y * 2 * duration;
         torpedo.transform.position = torpedoMovement;
 
         SpriteRenderer renderer = torpedo.GetComponent<SpriteRenderer>();
         Vector2 bubblePosition = torpedoMovement;
-        bubblePosition.y += (renderer.bounds.size.y / 2.0f);
+        bubblePosition.y -= (renderer.bounds.size.y / 2.0f);
         bubbles.Add(new Bubble(bubblePosition));
     }
 }
@@ -204,9 +209,6 @@ public class SubBoom : MonoBehaviour
     float timePlayed = 0.0f;
     float timeSinceSubAdded = 0.0f;
     ulong score = 0;
-
-    float torpedoSpawnTime;
-    float torpedoTimeUntilLaunch;
 
     // Start is called before the first frame update
     void Start()
@@ -295,22 +297,39 @@ public class SubBoom : MonoBehaviour
             SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
         }
 
+        // Update torpedos
+        List<Torpedo> explodedTorpedos = new List<Torpedo>();
+        foreach (var torp in torpedos)
+        {
+            torp.UpdateMovement(Time.deltaTime, bubbles);
+            if (torp.torpedo.transform.position.y > 2.9)
+            {
+                explodedTorpedos.Add(torp);
+            }
+        }
+
+        foreach (var torp in explodedTorpedos)
+        {
+            explosions.Add(new ExplosionEffect(new Vector2
+            (
+                torp.torpedo.transform.position.x,
+                torp.torpedo.transform.position.y))
+            );
+
+            Destroy(torp.torpedo);
+            torpedos.Remove(torp);
+        }
+
         // Update submarine positions
         foreach (var sub in submarines)
         {
             sub.UpdateMovement(Time.deltaTime, bubbles);
 
-            torpedoTimeUntilLaunch += Time.deltaTime;
-            if (torpedoTimeUntilLaunch >= torpedoSpawnTime)
+            if (sub.timeSinceLastTorpedo >= sub.timeUntilNextTorpedo)
             {
-                torpedos.Add(new Torpedo(sub.submarine.transform.position));
-                foreach (var torp in torpedos)
-                {
-                    torp.UpdateMovement(Time.deltaTime, pos, bubbles);
-                }
-
-                torpedoTimeUntilLaunch = 0;
-                torpedoSpawnTime = UnityEngine.Random.Range(1, 4);
+                torpedos.Add(new Torpedo(sub.submarine.transform.position, pos));
+                sub.timeSinceLastTorpedo = 0f;
+                sub.timeUntilNextTorpedo = UnityEngine.Random.Range(5.0f, 10.0f);
             }
         }
 
