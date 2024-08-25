@@ -255,8 +255,8 @@ public class SubBoom : MonoBehaviour
 
         Vector2 pos = destroyer.transform.position;
 
-        //while the game is active, the player can interact using the destroyer
-        while (isGameActive == true)
+        //if the game is active, the player can interact using the destroyer
+        if (isGameActive == true)
         {
             // Handle user input
             if (Input.GetKeyDown("space"))
