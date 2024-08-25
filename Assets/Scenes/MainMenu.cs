@@ -59,9 +59,4 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("SubBoomScene", LoadSceneMode.Single);
     }
-
-    public void MainMenuClick()
-    {
-        SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
-    }
 }

@@ -422,13 +422,11 @@ public class SubBoom : MonoBehaviour
 
         //instead of destroying the player object, we can deactivate it instead
         //that way, the game can be optimized a little bit
-        /*
         if (destroyer.activeInHierarchy == false)
         {
             isGameActive = false;
             gameOverScreen.SetActive(true);
         }
-        */
 
             // Bubbles
             List<Bubble> expiredBubbles = new List<Bubble>();
@@ -454,6 +452,16 @@ public class SubBoom : MonoBehaviour
     public void GameOverClick()
     {
         gameOverScreen.SetActive(true);
+    }
+
+    public void RestartClick()
+    {
+        SceneManager.LoadScene("SubBoomScene", LoadSceneMode.Single);
+    }
+
+    public void MainMenuClick()
+    {
+        SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
     }
 }
 
