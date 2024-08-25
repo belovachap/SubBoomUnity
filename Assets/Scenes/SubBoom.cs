@@ -136,11 +136,11 @@ public class Bubble
 
     public Bubble(Vector2 position)
     {
-        timeToExist = UnityEngine.Random.Range(1.0f, 2.0f);
+        timeToExist = UnityEngine.Random.Range(0.5f, 1.0f);
         go = Utilities.newSpriteGameObject
         (
             "Bubble",
-            Utilities.blankSquareTexture,
+            Utilities.blankCircleTexture,
             new Vector3(0.1f, 0.1f, 1f),
             position,
             new Color(0.5f, 0.0f, 1.0f, 0.5f)
