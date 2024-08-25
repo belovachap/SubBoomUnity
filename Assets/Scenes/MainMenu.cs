@@ -50,13 +50,18 @@ public class MainMenu : MonoBehaviour
         artworkRawImage.texture = Resources.Load<Texture2D>(artwork[Random.Range(0, 4)]);
     }
 
-    public void QuitButtonClick ()
+    public void QuitButtonClick()
     {
         Application.Quit();
     }
 
-    public void StartButtonClick ()
+    public void StartButtonClick()
     {
         SceneManager.LoadScene("SubBoomScene", LoadSceneMode.Single);
+    }
+
+    public void MainMenuClick()
+    {
+        SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
     }
 }
