@@ -525,7 +525,7 @@ public class ExplosionEffect
         };
 
         AudioSource audio = explodeCharge.GetComponent<AudioSource>();
-        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 6)]);
+        AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 5)]);
         audio.PlayOneShot(sound);
     }
 
