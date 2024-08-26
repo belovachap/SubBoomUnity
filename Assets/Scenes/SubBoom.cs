@@ -29,7 +29,6 @@ static class Utilities
 
         renderer.sprite = sprite;
         renderer.color = color;
-        go.AddComponent<AudioSource>();
 
         return go;
     }
@@ -89,7 +88,7 @@ public class Submarine
         );
 
         // Play sonar sound to introduce new submarine
-        AudioSource audio = submarine.GetComponent<AudioSource>();
+        AudioSource audio = submarine.AddComponent<AudioSource>();
         AudioClip sonar = Resources.Load<AudioClip>("submarine_sonar");
         audio.PlayOneShot(sonar);
     }
@@ -484,7 +483,7 @@ public class DepthCharge
         );
 
         // Play depth charge drop sound!
-        AudioSource audio = depthCharge.GetComponent<AudioSource>();
+        AudioSource audio = depthCharge.AddComponent<AudioSource>();
         AudioClip sound = Resources.Load<AudioClip>("depth_charge_drop");
         audio.PlayOneShot(sound);
     }
@@ -532,7 +531,7 @@ public class ExplosionEffect
             "dynamite5"
         };
 
-        AudioSource audio = explodeCharge.GetComponent<AudioSource>();
+        AudioSource audio = explodeCharge.AddComponent<AudioSource>();
         AudioClip sound = Resources.Load<AudioClip>(explosionSounds[UnityEngine.Random.Range(0, 5)]);
         audio.PlayOneShot(sound);
     }
