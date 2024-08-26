@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
-using UnityEditorInternal;
 
 static class Utilities
 {
@@ -264,6 +263,19 @@ public class SubBoom : MonoBehaviour
                 depthCharges.Add(new DepthCharge(pos));
             }
 
+            if (Input.GetKey("space") && depthCharges.Count > 0)
+            {
+                //depthCharge moves downward until space key is released 
+                //depthCharges[index].transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
+                //int chargeIndex = depthCharges.IndexOf(pos);
+            }
+
+            if (Input.GetKeyUp("space") && depthCharges.Count > 0)
+            {
+                //call ExplodeCharge() method
+                //clear depthCharges List and currentDepthCharge
+            }
+
             if (Input.GetKey("left"))
             {
                 pos.x -= Time.deltaTime * 3;
@@ -327,9 +339,8 @@ public class SubBoom : MonoBehaviour
         List<DepthCharge> explodedCharges = new List<DepthCharge>();
         foreach (var dc in depthCharges)
         {
-            dc.UpdateMovement(bubbles);
-
-            if (Input.GetKeyUp("space") && depthCharges.Count > 0)
+            dc.UpdateMovement(Time.deltaTime, bubbles);
+            if (dc.secondsSinceDropped >= dc.timeUntilExplode)
             {
                 explodedCharges.Add(dc);
             }
@@ -359,7 +370,7 @@ public class SubBoom : MonoBehaviour
                 explosions.Remove(ec);
                 break;
             }
-            ec.UpdateMovement();
+            ec.UpdateMovement(Time.deltaTime);
         }
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
@@ -375,7 +386,8 @@ public class SubBoom : MonoBehaviour
                 if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching
                    (sub.submarine.GetComponent<BoxCollider2D>()) == true)
                 {
-                    //game crashing submarine bug is probably here
+                    Debug.Log("This works!");
+
                     Destroy(sub.submarine);
                     submarines.Remove(sub);
 
@@ -438,24 +450,21 @@ public class SubBoom : MonoBehaviour
     {
         GameData gd = GameDataFileHandler.Load();
         DateTime now = DateTime.Now;
-
         gd.totalGamesPlayed += 1;
         gd.totalSecondsPlayed += (ulong)timePlayed;
         gd.lastScore = score;
         gd.lastScoreDateTime = now.ToString();
-
         if (score >= gd.highScore)
         {
             gd.highScore = score;
             gd.highScoreDateTime = now.ToString();
         }
-
         GameDataFileHandler.Save(gd);
     }
 
     void OnApplicationQuit()
     {
-        if (isGameActive)
+        if(isGameActive)
         {
             SaveGameStats();
         }
@@ -466,6 +475,8 @@ public class DepthCharge
 {
     public GameObject depthCharge;
     float velocity = -0.5f;
+    public float secondsSinceDropped = 0.0f;
+    public float timeUntilExplode = 10.0f;
 
     public DepthCharge(Vector2 destroyerPosition)
     {
@@ -484,22 +495,18 @@ public class DepthCharge
         audio.PlayOneShot(sound);
     }
 
-    public void UpdateMovement(List<Bubble> bubbles)
+    public void UpdateMovement(float dt, List<Bubble> bubbles)
     {
+        secondsSinceDropped += dt;
         Vector2 pos = depthCharge.transform.position;
+        pos.y += dt * velocity;
+        depthCharge.transform.position = pos;
 
-        if (Input.GetKey("space"))
-        {
-            //secondsSinceDropped += dt;
-            pos.y += Time.deltaTime * velocity;
-            depthCharge.transform.position = pos;
-
-            // Add bubbles
-            SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
-            Vector2 bubblePos = pos;
-            bubblePos.y += (renderer.bounds.size.y / 2.0f);
-            bubbles.Add(new Bubble(bubblePos));
-        }
+        // Add a bubble
+        SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
+        Vector2 bubblePos = pos;
+        bubblePos.y += (renderer.bounds.size.y / 2.0f);
+        bubbles.Add(new Bubble(bubblePos));
     }
 }
 
@@ -537,9 +544,9 @@ public class ExplosionEffect
     }
 
     //maybe add another variable to the method that will grab the current explodeCharge's collider component?
-    public void UpdateMovement()
+    public void UpdateMovement(float explosionDuration)
     {
-        secondsSinceDropped += Time.deltaTime;
-        explodeCharge.transform.localScale += new Vector3 (Time.deltaTime, Time.deltaTime, 0);
+        secondsSinceDropped += explosionDuration;
+        explodeCharge.transform.localScale += new Vector3 (explosionDuration, explosionDuration, 0);
     }
 }
