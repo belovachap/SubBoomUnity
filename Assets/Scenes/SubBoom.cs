@@ -289,24 +289,6 @@ public class SubBoom : MonoBehaviour
                 pos.x = Mathf.Min(pos.x, 9.25f);
                 destroyer.transform.position = pos;
             }
-
-            if (Input.GetKey("escape"))
-            {
-                GameData gd = GameDataFileHandler.Load();
-                DateTime now = DateTime.Now;
-                gd.totalGamesPlayed += 1;
-                gd.totalSecondsPlayed += (ulong)timePlayed;
-                gd.lastScore = (ulong)score;
-                gd.lastScoreDateTime = now.ToString();
-                if (score >= gd.highScore)
-                {
-                    gd.highScore = score;
-                    gd.highScoreDateTime = now.ToString();
-                }
-                GameDataFileHandler.Save(gd);
-
-                SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
-            }
         }
 
         // Update torpedos
@@ -421,10 +403,11 @@ public class SubBoom : MonoBehaviour
 
         //instead of destroying the player object, we can deactivate it instead
         //that way, the game can be optimized a little bit
-        if (destroyer.activeInHierarchy == false)
+        if (destroyer.activeInHierarchy == false && isGameActive)
         {
             isGameActive = false;
             gameOverScreen.SetActive(true);
+            SaveGameStats();
         }
 
             // Bubbles
@@ -461,6 +444,30 @@ public class SubBoom : MonoBehaviour
     public void MainMenuClick()
     {
         SceneManager.LoadScene("MainMenuScene", LoadSceneMode.Single);
+    }
+
+    void SaveGameStats()
+    {
+        GameData gd = GameDataFileHandler.Load();
+        DateTime now = DateTime.Now;
+        gd.totalGamesPlayed += 1;
+        gd.totalSecondsPlayed += (ulong)timePlayed;
+        gd.lastScore = score;
+        gd.lastScoreDateTime = now.ToString();
+        if (score >= gd.highScore)
+        {
+            gd.highScore = score;
+            gd.highScoreDateTime = now.ToString();
+        }
+        GameDataFileHandler.Save(gd);
+    }
+
+    void OnApplicationQuit()
+    {
+        if(isGameActive)
+        {
+            SaveGameStats();
+        }
     }
 }
 
