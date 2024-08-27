@@ -45,9 +45,13 @@ public class MainMenu : MonoBehaviour
             "sub_boom_art_one",
             "sub_boom_art_two",
             "sub_boom_art_three",
-            "sub_boom_art_four"
+            "sub_boom_art_four",
+            "sub_boom_art_five",
+            "sub_boom_art_six",
+            "sub_boom_art_seven"
+
         };
-        artworkRawImage.texture = Resources.Load<Texture2D>(artwork[Random.Range(0, 4)]);
+        artworkRawImage.texture = Resources.Load<Texture2D>(artwork[Random.Range(0, 7)]);
     }
 
     public void QuitButtonClick()
