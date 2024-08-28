@@ -195,6 +195,9 @@ public class SubBoom : MonoBehaviour
     [SerializeField]
     Text scoreText;
 
+    [SerializeField]
+    public Text depthText;
+
     GameObject ocean;
     GameObject destroyer;
 
@@ -211,6 +214,7 @@ public class SubBoom : MonoBehaviour
     float timePlayed = 0.0f;
     float timeSinceSubAdded = 0.0f;
     ulong score = 0;
+    ulong depth = 0;
 
     public GameObject gameOverScreen;
     public bool isGameActive = false;
@@ -329,7 +333,8 @@ public class SubBoom : MonoBehaviour
         {
             dc.UpdateMovement(bubbles);
 
-            if (Input.GetKeyUp("space") && depthCharges.Count > 0)
+            //need to figure out a way for the DepthCharge() GetKeyUp movement to finish before exploding it
+            if (Input.GetKeyUp("space") && depthCharges.Count > 0 && DepthCharge.hasChargeFullyTraveled == true)
             {
                 explodedCharges.Add(dc);
             }
@@ -367,6 +372,7 @@ public class SubBoom : MonoBehaviour
 
         //update: it may be easier to try the method OnCollisionEnter2D
         //if we are able to get both box colliders somehow
+        HashSet<Submarine> deadSubmarines = new HashSet<Submarine>();
         foreach (var ec in explosions)
         {
             foreach (var sub in submarines)
@@ -375,12 +381,16 @@ public class SubBoom : MonoBehaviour
                 if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching
                    (sub.submarine.GetComponent<BoxCollider2D>()) == true)
                 {
-                    //game crashing submarine bug is probably here
-                    Destroy(sub.submarine);
-                    submarines.Remove(sub);
-
-                    score += 1;
+                    deadSubmarines.Add(sub);
                 }
+            }
+
+            foreach (var sub in deadSubmarines)
+            {
+                Destroy(sub.submarine);
+                submarines.Remove(sub);
+
+                score += 1;
             }
 
             if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching(destroyer.GetComponent<BoxCollider2D>()))
@@ -398,8 +408,8 @@ public class SubBoom : MonoBehaviour
             SaveGameStats();
         }
 
-            // Bubbles
-            List<Bubble> expiredBubbles = new List<Bubble>();
+        // Bubbles
+        List<Bubble> expiredBubbles = new List<Bubble>();
         foreach (var bubble in bubbles) 
         {
             bubble.UpdateMovement(Time.deltaTime);
@@ -465,7 +475,8 @@ public class SubBoom : MonoBehaviour
 public class DepthCharge
 {
     public GameObject depthCharge;
-    float velocity = -0.5f;
+
+    public bool hasChargeFullyTraveled = false;
 
     public DepthCharge(Vector2 destroyerPosition)
     {
@@ -487,19 +498,30 @@ public class DepthCharge
     public void UpdateMovement(List<Bubble> bubbles)
     {
         Vector2 pos = depthCharge.transform.position;
+        float speed = -0.5f;
+        float velocity = 0f;
 
+        SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
         if (Input.GetKey("space"))
         {
-            //secondsSinceDropped += dt;
-            pos.y += Time.deltaTime * velocity;
+            velocity += Time.deltaTime * speed;
+        }
+
+        if (Input.GetKeyUp("space"))
+        {
+            //insert math equation here
+            pos.y = velocity;
             depthCharge.transform.position = pos;
 
-            // Add bubbles
-            SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
+            //add bubbles
             Vector2 bubblePos = pos;
             bubblePos.y += (renderer.bounds.size.y / 2.0f);
             bubbles.Add(new Bubble(bubblePos));
         }
+
+        hasChargeFullyTraveled = true;
+
+        //depthText.text = "Depth: " + depth.ToString();
     }
 }
 
