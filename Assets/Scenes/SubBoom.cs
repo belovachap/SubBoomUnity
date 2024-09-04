@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
+using UnityEditorInternal;
 
 static class Utilities
 {
@@ -194,6 +195,9 @@ public class SubBoom : MonoBehaviour
     [SerializeField]
     Text scoreText;
 
+    [SerializeField]
+    Text depthText;
+
     GameObject ocean;
     GameObject destroyer;
 
@@ -210,9 +214,11 @@ public class SubBoom : MonoBehaviour
     float timePlayed = 0.0f;
     float timeSinceSubAdded = 0.0f;
     ulong score = 0;
+    ulong depth = 0;
 
     public GameObject gameOverScreen;
     public bool isGameActive = false;
+    float timeHeldSpace = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -260,20 +266,20 @@ public class SubBoom : MonoBehaviour
             // Handle user input
             if (Input.GetKeyDown("space"))
             {
-                depthCharges.Add(new DepthCharge(pos));
+                //once get key has been pressed, start a timer for how long it is held down
+                //once get key up is true, timer stops and we use that time to add to the posy of depth charge
+                timeHeldSpace = 0;
             }
 
-            if (Input.GetKey("space") && depthCharges.Count > 0)
+            if (Input.GetKey("space"))
             {
-                //depthCharge moves downward until space key is released 
-                //depthCharges[index].transform.Translate(Vector2.down * Time.deltaTime * 1.1f);
-                //int chargeIndex = depthCharges.IndexOf(pos);
+                timeHeldSpace += Time.deltaTime;
+                depth = (ulong) (timeHeldSpace * 0.5 * 100);
             }
 
-            if (Input.GetKeyUp("space") && depthCharges.Count > 0)
+            if (Input.GetKeyUp("space"))
             {
-                //call ExplodeCharge() method
-                //clear depthCharges List and currentDepthCharge
+                depthCharges.Add(new DepthCharge(pos, timeHeldSpace));
             }
 
             if (Input.GetKey("left"))
@@ -340,7 +346,9 @@ public class SubBoom : MonoBehaviour
         foreach (var dc in depthCharges)
         {
             dc.UpdateMovement(Time.deltaTime, bubbles);
-            if (dc.secondsSinceDropped >= dc.timeUntilExplode)
+
+            //need to figure out a way for the DepthCharge() GetKeyUp movement to finish before exploding it
+            if (dc.timeExisted > dc.timeToExist)
             {
                 explodedCharges.Add(dc);
             }
@@ -370,7 +378,7 @@ public class SubBoom : MonoBehaviour
                 explosions.Remove(ec);
                 break;
             }
-            ec.UpdateMovement(Time.deltaTime);
+            ec.UpdateMovement();
         }
 
         //loop that checks if any items in explosions list is touching a submarine collider or destroyer collider
@@ -378,6 +386,7 @@ public class SubBoom : MonoBehaviour
 
         //update: it may be easier to try the method OnCollisionEnter2D
         //if we are able to get both box colliders somehow
+        HashSet<Submarine> deadSubmarines = new HashSet<Submarine>();
         foreach (var ec in explosions)
         {
             foreach (var sub in submarines)
@@ -386,13 +395,16 @@ public class SubBoom : MonoBehaviour
                 if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching
                    (sub.submarine.GetComponent<BoxCollider2D>()) == true)
                 {
-                    Debug.Log("This works!");
-
-                    Destroy(sub.submarine);
-                    submarines.Remove(sub);
-
-                    score += 1;
+                    deadSubmarines.Add(sub);
                 }
+            }
+
+            foreach (var sub in deadSubmarines)
+            {
+                Destroy(sub.submarine);
+                submarines.Remove(sub);
+
+                score += 1;
             }
 
             if (ec.explodeCharge.GetComponent<BoxCollider2D>().IsTouching(destroyer.GetComponent<BoxCollider2D>()))
@@ -410,8 +422,8 @@ public class SubBoom : MonoBehaviour
             SaveGameStats();
         }
 
-            // Bubbles
-            List<Bubble> expiredBubbles = new List<Bubble>();
+        // Bubbles
+        List<Bubble> expiredBubbles = new List<Bubble>();
         foreach (var bubble in bubbles) 
         {
             bubble.UpdateMovement(Time.deltaTime);
@@ -429,6 +441,7 @@ public class SubBoom : MonoBehaviour
         }
 
         scoreText.text = "Score: " + score.ToString();
+        depthText.text = "Depth: " + depth.ToString();
     }
 
     public void GameOverClick()
@@ -450,21 +463,24 @@ public class SubBoom : MonoBehaviour
     {
         GameData gd = GameDataFileHandler.Load();
         DateTime now = DateTime.Now;
+
         gd.totalGamesPlayed += 1;
         gd.totalSecondsPlayed += (ulong)timePlayed;
         gd.lastScore = score;
         gd.lastScoreDateTime = now.ToString();
+
         if (score >= gd.highScore)
         {
             gd.highScore = score;
             gd.highScoreDateTime = now.ToString();
         }
+
         GameDataFileHandler.Save(gd);
     }
 
     void OnApplicationQuit()
     {
-        if(isGameActive)
+        if (isGameActive)
         {
             SaveGameStats();
         }
@@ -474,11 +490,11 @@ public class SubBoom : MonoBehaviour
 public class DepthCharge
 {
     public GameObject depthCharge;
-    float velocity = -0.5f;
-    public float secondsSinceDropped = 0.0f;
-    public float timeUntilExplode = 10.0f;
 
-    public DepthCharge(Vector2 destroyerPosition)
+    public float timeExisted;
+    public float timeToExist;
+
+    public DepthCharge(Vector2 destroyerPosition, float spawnDuration)
     {
         depthCharge = Utilities.newSpriteGameObject
         (
@@ -493,17 +509,25 @@ public class DepthCharge
         AudioSource audio = depthCharge.AddComponent<AudioSource>();
         AudioClip sound = Resources.Load<AudioClip>("depth_charge_drop");
         audio.PlayOneShot(sound);
+
+        timeToExist = spawnDuration;
+        Debug.Log("The spawnDuration is: " + spawnDuration);
     }
 
     public void UpdateMovement(float dt, List<Bubble> bubbles)
     {
-        secondsSinceDropped += dt;
         Vector2 pos = depthCharge.transform.position;
-        pos.y += dt * velocity;
+        float speed = -0.65f;
+
+        timeExisted += dt;
+
+        SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
+
+        //insert math equation here
+        pos.y += speed * dt;
         depthCharge.transform.position = pos;
 
-        // Add a bubble
-        SpriteRenderer renderer = depthCharge.GetComponent<SpriteRenderer>();
+        //add bubbles
         Vector2 bubblePos = pos;
         bubblePos.y += (renderer.bounds.size.y / 2.0f);
         bubbles.Add(new Bubble(bubblePos));
@@ -544,9 +568,9 @@ public class ExplosionEffect
     }
 
     //maybe add another variable to the method that will grab the current explodeCharge's collider component?
-    public void UpdateMovement(float explosionDuration)
+    public void UpdateMovement()
     {
-        secondsSinceDropped += explosionDuration;
-        explodeCharge.transform.localScale += new Vector3 (explosionDuration, explosionDuration, 0);
+        secondsSinceDropped += Time.deltaTime;
+        explodeCharge.transform.localScale += new Vector3 (Time.deltaTime, Time.deltaTime, 0);
     }
 }
