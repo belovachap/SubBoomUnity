@@ -198,6 +198,9 @@ public class SubBoom : MonoBehaviour
     [SerializeField]
     Text depthText;
 
+    [SerializeField]
+    Slider depthSlider;
+
     GameObject ocean;
     GameObject destroyer;
 
@@ -275,6 +278,7 @@ public class SubBoom : MonoBehaviour
             {
                 timeHeldSpace += Time.deltaTime;
                 depth = (ulong) (timeHeldSpace * 0.5 * 100);
+                depthSlider.value = depth;
             }
 
             if (Input.GetKeyUp("space"))
