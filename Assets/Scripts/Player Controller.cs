@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        isGameActive = true;
     }
 
     // Update is called once per frame
@@ -34,36 +34,36 @@ public class PlayerController : MonoBehaviour
         if (isGameActive == true)
         {
             // handle user input
-            if (Input.GetKeyDown("space"))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 // once get key has been pressed, start a timer for how long it is held down
                 // once get key up is true, timer stops and we use that time to add to the posy of depth charge
                 timeHeldSpace = 0;
             }
 
-            if (Input.GetKey("space"))
+            if (Input.GetKey(KeyCode.Space))
             {
                 timeHeldSpace += Time.deltaTime;
                 depth = (ulong)(timeHeldSpace * 0.5 * 100);
                 // depthSlider.value = depth;
             }
 
-            if (Input.GetKeyUp("space"))
+            if (Input.GetKeyUp(KeyCode.Space))
             {
                 GameObject dc = Instantiate(depthCharge);
                 dc.GetComponent<DepthChargeController>().spawnDuration = timeHeldSpace;
-                // dc.transform.position = pos;
+                dc.transform.position = pos;
                 depthChargeList.Add(dc);
             }
 
-            if (Input.GetKey("left"))
+            if (Input.GetKey(KeyCode.LeftArrow))
             {
                 pos.x -= Time.deltaTime * 3;
                 pos.x = Mathf.Max(pos.x, -9.25f);
                 destroyer.transform.position = pos;
             }
 
-            if (Input.GetKey("right"))
+            if (Input.GetKey(KeyCode.RightArrow))
             {
                 pos.x += Time.deltaTime * 3;
                 pos.x = Mathf.Min(pos.x, 9.25f);

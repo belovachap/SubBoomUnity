@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class DepthChargeController : MonoBehaviour
 {
-
     public GameObject depthCharge;
 
     public float timeExisted;
