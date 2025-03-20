@@ -2,41 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DepthChargeController : MonoBehaviour
+public class DepthChargeController : PlayerController
 {
-    public GameObject depthCharge;
-
-    public float timeExisted;
-    public float timeToExist;
+    private float timeExisted;
+    // private float timeToExist;
 
     public float spawnDuration;
 
-    // Start is called before the first frame update
+    private AudioSource source;
+    [SerializeField] private AudioClip dropClip;
+
+    private Vector2 currentPos;
+
     void Start()
     {
-        AudioSource audio = depthCharge.AddComponent<AudioSource>();
-        AudioClip sound = Resources.Load<AudioClip>("depth_charge_drop");
-        audio.PlayOneShot(sound);
+        source = gameObject.GetComponent<AudioSource>();
+        source.clip = dropClip;
+        source.Play();
 
-        timeToExist = spawnDuration;
+        // timeToExist = spawnDuration;
         Debug.Log("The spawnDuration is: " + spawnDuration);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        UpdateMovement();
-    }
-
-    public void UpdateMovement()
-    {
-        Vector2 pos = depthCharge.transform.position;
-        float speed = -0.65f;
-
-        timeExisted += Time.deltaTime;
-
-        //insert math equation here
-        pos.y += speed * Time.deltaTime;
-        depthCharge.transform.position = pos;
     }
 }

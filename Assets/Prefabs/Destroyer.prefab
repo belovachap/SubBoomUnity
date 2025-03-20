@@ -4845,7 +4845,7 @@ GameObject:
   - component: {fileID: 3490335424383053330}
   m_Layer: 0
   m_Name: Destroyer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4932,7 +4932,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyer: {fileID: 3316071093313057829}
   depthCharge: {fileID: 1081030429656691429, guid: c1338970cd1abc643a3e9697d063a13e, type: 3}
-  isGameActive: 0
+  depthChargeList: []
+  timePlayed: 0
+  timeHeldSpace: 0
 --- !u!50 &2745290289588364671
 Rigidbody2D:
   serializedVersion: 4
