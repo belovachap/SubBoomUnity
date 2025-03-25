@@ -35,7 +35,6 @@ public class ObjectPooler : MonoBehaviour
             // adds the submarines as a child object of the Sub Boom game object
             sub.transform.SetParent(this.transform);
 
-
             // pooling depthCharges (for player)
             GameObject dc = (GameObject) Instantiate(depthCharge);
             dc.SetActive(false);

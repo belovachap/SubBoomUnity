@@ -67,18 +67,28 @@ public class PlayerController : MonoBehaviour
                     // continue doing this next
                     // 3/18/25
                     dc.SetActive(true);
-
+                    
                     dc.GetComponent<DepthChargeController>().spawnDuration = timeHeldSpace;
 
                     float timer = 0;
+                    // dc.transform.position = pos;
 
-                    while (timer < timeHeldSpace)
+                    dc.GetComponent<DepthChargeController>().UpdateMovement(pos);
+                    /*
+                    if (timer < timeHeldSpace)
                     {
-                        dc.transform.position = pos;
-                        dc.transform.position += new Vector3 (0, -0.65f * Time.deltaTime, 0);
-
+                        // dc.transform.position += new Vector3 (0, -0.65f * Time.deltaTime, 0);
+                        dc.transform.Translate(2 * Time.deltaTime * Vector3.down);
                         timer += Time.deltaTime;
                     }
+
+                    if (timer == timeHeldSpace)
+                    {
+                        dc.SetActive(false);
+                    }
+                    */
+
+                    // once timer is done, depthCharge is meant to explode
                 }
             }
 
