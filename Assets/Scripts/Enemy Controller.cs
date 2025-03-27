@@ -8,9 +8,6 @@ public class EnemyController : MonoBehaviour
 {
     [SerializeField] private GameObject bubbleParticles;
 
-    BoxCollider2D enemyCollider;
-    SpriteRenderer spriteRenderer;
-
     protected float timeSinceLastTorpedo = 0f;
     protected float timeUntilNextTorpedo;
 
@@ -23,10 +20,6 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
-        // instantiates the collider and sprite renderer
-        enemyCollider = gameObject.GetComponent<BoxCollider2D>();
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-
         // instantiates the depth (y spawn level) and how fast the sub travels
         depth = Random.Range(-4.5f, 2);
         speed = Random.Range(0.5f, 1.5f);
@@ -79,7 +72,7 @@ public class EnemyController : MonoBehaviour
             var flipPos = bubbleParticles.transform.position;
             flipPos.x *= -1f;
             bubbleParticles.transform.position = flipPos;
-
+            
             // flips the bubbleParticles localScale to be behind the submarine
             var flipScale = bubbleParticles.transform.localScale;
             flipScale.x *= -1f;
