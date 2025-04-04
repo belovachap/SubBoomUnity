@@ -13,7 +13,10 @@ public class ObjectPooler : MonoBehaviour
     [SerializeField] private GameObject depthCharge;
     private List<GameObject> depthChargeList = new();
 
-    float timeSinceSubAdded = 0.0f;
+    private static int subCount = 10;
+    private static int depthCount = 10;
+
+    private float timeSinceSubAdded = 0.0f;
 
     private void Awake()
     {
@@ -22,11 +25,22 @@ public class ObjectPooler : MonoBehaviour
 
     void Start()
     {
-        // list will be 10 indexes long
-        for (int i = 0; i < 10; i++)
+        SpawnSubmarines();
+        SpawnDepthCharges();
+    }
+
+    private void Update()
+    {
+        SubmarineManager();
+        DepthChargeManager();
+    }
+
+    public void SpawnSubmarines()
+    {
+        for (int i = 0; i < subCount; i++)
         {
             // pooling submarines
-            GameObject sub = (GameObject) Instantiate(submarine);
+            GameObject sub = (GameObject)Instantiate(submarine);
 
             // hides the game object so that not all 10 spawn when the game starts
             sub.SetActive(false);
@@ -34,20 +48,7 @@ public class ObjectPooler : MonoBehaviour
 
             // adds the submarines as a child object of the Sub Boom game object
             sub.transform.SetParent(this.transform);
-
-            // pooling depthCharges (for player)
-            GameObject dc = (GameObject) Instantiate(depthCharge);
-            dc.SetActive(false);
-            depthChargeList.Add(dc);
-
-            dc.transform.SetParent(GameObject.FindGameObjectWithTag("Player").transform);
         }
-    }
-
-    private void Update()
-    {
-        SubmarineManager();
-        DepthChargeManager();
     }
 
     public void SubmarineManager()
@@ -69,6 +70,24 @@ public class ObjectPooler : MonoBehaviour
                     break;
                 }
             }
+        }
+    }
+
+    public void SpawnDepthCharges()
+    {
+        for (int i = 0; i < depthCount; i++)
+        {
+            // pooling depthCharges (for player)
+            GameObject dc = (GameObject)Instantiate(depthCharge);
+
+            // hides depthCharges when game starts
+            dc.SetActive(false);
+            
+            // adds depthCharge to list
+            depthChargeList.Add(dc);
+
+            // sets the depthCharges as a child of the Player (Destroyer) object
+            dc.transform.SetParent(GameObject.FindGameObjectWithTag("Player").transform);
         }
     }
 
