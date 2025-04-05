@@ -9,7 +9,7 @@ public class DepthChargeController : MonoBehaviour
 
     private GameObject player;
 
-    private float speed = 0.6f;
+    private readonly float speed = 0.6f;
 
     void Start()
     {
