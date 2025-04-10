@@ -13,7 +13,13 @@ public class ObjectPooler : MonoBehaviour
     [SerializeField] private GameObject depthCharge;
     private List<GameObject> depthChargeList = new();
 
-    float timeSinceSubAdded = 0.0f;
+    [SerializeField] private GameObject torpedo;
+    private List<GameObject> torpedoList = new();
+
+    private static int subCount = 10;
+    private static int depthCount = 10;
+
+    private float timeSinceSubAdded = 0.0f;
 
     private void Awake()
     {
@@ -22,27 +28,8 @@ public class ObjectPooler : MonoBehaviour
 
     void Start()
     {
-        // list will be 10 indexes long
-        for (int i = 0; i < 10; i++)
-        {
-            // pooling submarines
-            GameObject sub = (GameObject) Instantiate(submarine);
-
-            // hides the game object so that not all 10 spawn when the game starts
-            sub.SetActive(false);
-            submarineList.Add(sub);
-
-            // adds the submarines as a child object of the Sub Boom game object
-            sub.transform.SetParent(this.transform);
-
-
-            // pooling depthCharges (for player)
-            GameObject dc = (GameObject) Instantiate(depthCharge);
-            dc.SetActive(false);
-            depthChargeList.Add(dc);
-
-            dc.transform.SetParent(GameObject.FindGameObjectWithTag("Player").transform);
-        }
+        SpawnSubmarines();
+        SpawnDepthCharges();
     }
 
     private void Update()
@@ -51,12 +38,30 @@ public class ObjectPooler : MonoBehaviour
         DepthChargeManager();
     }
 
+    public void SpawnSubmarines()
+    {
+        for (int i = 0; i < subCount; i++)
+        {
+            // pooling submarines
+            GameObject sub = (GameObject)Instantiate(submarine);
+
+            // hides the game object so that not all 10 spawn when the game starts
+            sub.SetActive(false);
+            submarineList.Add(sub);
+
+            // adds the submarines as a child object of the Sub Boom game object
+            sub.transform.SetParent(this.transform);
+        }
+
+        SpawnTorpedos();
+    }
+
     public void SubmarineManager()
     {
         // add a new submarine if it's been at least 10 seconds
         timeSinceSubAdded += Time.deltaTime;
 
-        if (timeSinceSubAdded >= 10)
+        if (timeSinceSubAdded >= 5)
         {
             timeSinceSubAdded = 0.0f;
 
@@ -73,9 +78,60 @@ public class ObjectPooler : MonoBehaviour
         }
     }
 
+    public void SpawnTorpedos()
+    {
+        for (int i = 0; i < subCount; i++)
+        {
+            // creates a new torpedo object
+            GameObject torp = (GameObject)Instantiate(torpedo);
+
+            // hides the game object
+            torp.SetActive(false);
+
+            // adds torpedo to torpedo list
+            torpedoList.Add(torp);
+
+            // adds torpedo to each submarine
+            torp.transform.SetParent(submarineList[i].transform);
+        }
+    }
+
+    public GameObject TorpedoManager()
+    {
+        // for as many objects as are in the pooledObjects list
+        for (int i = 0; i < torpedoList.Count; i++)
+        {
+            // if the pooled objects is NOT active, return that object 
+            if (!torpedoList[i].activeInHierarchy)
+            {
+                return torpedoList[i];
+            }
+        }
+        // otherwise, return null   
+        return null;
+    }
+
+    public void SpawnDepthCharges()
+    {
+        for (int i = 0; i < depthCount; i++)
+        {
+            // pooling depthCharges (for player)
+            GameObject dc = (GameObject)Instantiate(depthCharge);
+
+            // hides depthCharges when game starts
+            dc.SetActive(false);
+            
+            // adds depthCharge to list
+            depthChargeList.Add(dc);
+
+            // sets the depthCharges as a child of the Player (Destroyer) object
+            dc.transform.SetParent(GameObject.FindGameObjectWithTag("Player").transform);
+        }
+    }
+
     public GameObject DepthChargeManager()
     {
-        // For as many objects as are in the pooledObjects list
+        // for as many objects as are in the pooledObjects list
         for (int i = 0; i < depthChargeList.Count; i++)
         {
             // if the pooled objects is NOT active, return that object 
