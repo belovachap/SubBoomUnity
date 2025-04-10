@@ -582,6 +582,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   submarine: {fileID: 3343165618616635689, guid: abd95741b80320948b8d3e7ded75c393, type: 3}
   depthCharge: {fileID: 261079894268171960, guid: 120a79701ce99a74cbd5ebbfd9b268c7, type: 3}
+  torpedo: {fileID: 4979077404349424038, guid: 486d17ff80e78304cb2420e5c304efaa, type: 3}
 --- !u!1 &489914504
 GameObject:
   m_ObjectHideFlags: 0

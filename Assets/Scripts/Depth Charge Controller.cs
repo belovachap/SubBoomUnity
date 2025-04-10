@@ -4,25 +4,21 @@ using UnityEngine;
 
 public class DepthChargeController : MonoBehaviour
 {
+    private readonly float speed = 0.6f;
+
     private AudioSource source;
     [SerializeField] private AudioClip dropClip;
-
-    private GameObject player;
-
-    private readonly float speed = 0.6f;
 
     void Start()
     {
         source = gameObject.GetComponent<AudioSource>();
         source.clip = dropClip;
         source.Play();
-
-        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     private void Update()
     {
-        if (gameObject.activeInHierarchy)
+        if (gameObject.activeSelf)
         {
             transform.Translate(speed * Time.deltaTime * Vector3.down);
         }

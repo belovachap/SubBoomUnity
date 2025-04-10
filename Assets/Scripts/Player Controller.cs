@@ -86,7 +86,11 @@ public class PlayerController : MonoBehaviour
         // if the gameobject is not null, set it to active
         if (dc != null)
         {
+            // TODO:
+            // only pass this once to spawn
+            // do not update x value of depth charge
             dc.transform.position = playerPos;
+
             dc.SetActive(true);
 
             Debug.Log("Time Held Space amount is: " + timeHeldSpace);
@@ -103,9 +107,9 @@ public class PlayerController : MonoBehaviour
             if (timer >= timeHeldSpace)
             {
                 dc.SetActive(false);
+                Debug.Log("Depth Charge Movement is Completed!");
             }
 
-            Debug.Log("Depth Charge Movement is Completed!");
             // once timer is done, depthCharge is meant to explode
         }
     }
