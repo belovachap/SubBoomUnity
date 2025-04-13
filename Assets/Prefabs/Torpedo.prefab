@@ -47,6 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baed707d880b9bc4b83b12c18d41adee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 0.5
+  duration: 3
+  dropClip: {fileID: 0}
 --- !u!33 &1138801018124858352
 MeshFilter:
   m_ObjectHideFlags: 0

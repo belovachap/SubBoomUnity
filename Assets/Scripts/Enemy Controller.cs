@@ -50,7 +50,11 @@ public class EnemyController : MonoBehaviour
 
         gameObject.transform.position = currentPos;
 
-        TorpedoHandler();
+        timeSinceLastTorpedo += Time.deltaTime;
+        if (timeSinceLastTorpedo >= timeUntilNextTorpedo)
+        {
+            TorpedoHandler(gameObject.transform.position);
+        }
     }
 
     private void Setup()
@@ -91,28 +95,19 @@ public class EnemyController : MonoBehaviour
         gameObject.transform.position = spawnPos;
     }
 
-    void TorpedoHandler()
+    void TorpedoHandler(Vector3 subPos)
     {
-        timeSinceLastTorpedo += Time.deltaTime;
+        GameObject torp = ObjectPooler.SharedInstance.TorpedoManager();
 
-        if (timeSinceLastTorpedo >= timeUntilNextTorpedo)
+        if (torp != null)
         {
-            GameObject torp = ObjectPooler.SharedInstance.TorpedoManager();
+            torp.transform.position = subPos;
+            torp.SetActive(true);
 
-            if (torp != null)
-            {
-                torp.transform.position = gameObject.transform.position;
-                torp.SetActive(true);
-
-                Debug.Log("Torpedo launched!");
-
-                // TODO:
-                // finish this part next for torpedos
-
-            }
-
-            timeSinceLastTorpedo = 0f;
-            timeUntilNextTorpedo = Random.Range(5.0f, 10.0f);
+            Debug.Log("Torpedo launched!");
         }
+
+        timeSinceLastTorpedo = 0f;
+        timeUntilNextTorpedo = Random.Range(5.0f, 10.0f);
     }
 }

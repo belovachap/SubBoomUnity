@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TorpedoController : MonoBehaviour
@@ -35,19 +36,30 @@ public class TorpedoController : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            distance = CalculateDistance(submarine.transform.position, player.transform.position);
+            distance = CalculateDistance(gameObject.transform.position, player.GetComponent<PlayerController>().GetPlayerPosition());
 
             gameObject.transform.position = Vector3.MoveTowards(
-                                                    submarine.transform.position,
-                                                    player.transform.position,
+                                                    gameObject.transform.position,
+                                                    player.GetComponent<PlayerController>().GetPlayerPosition(),
                                                     (distance/duration) * Time.deltaTime
                                                     );
 
+            /*
             if (gameObject.transform.position.y >= 0)
             {
                 Debug.Log("Torpedo Exploded!");
-                // gameObject.SetActive(false);
+                gameObject.SetActive(false);
             }
+            */
+        }
+    }
+
+    private void OnTrigger(Collider other)
+    {
+        if (other.gameObject.name == "Border")
+        {
+            Debug.Log("Torpedo Exploded!");
+            gameObject.SetActive(false);
         }
     }
 
