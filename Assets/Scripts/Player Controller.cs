@@ -6,6 +6,7 @@ using static UnityEditor.PlayerSettings;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameObject depthCharge;
+    [SerializeField] private GameObject dcManager;
 
     private ulong depth = 0;
 
@@ -14,7 +15,7 @@ public class PlayerController : MonoBehaviour
     public float timePlayed = 0.0f;
     public float timeHeldSpace = 0f;
 
-    private readonly float speed = 3f;
+    private const float speed = 3f;
 
     // Start is called before the first frame update
     void Start()
@@ -28,6 +29,7 @@ public class PlayerController : MonoBehaviour
         timePlayed += Time.deltaTime;
 
         Vector3 pos = gameObject.transform.position;
+
         float movement = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
 
         // if the game is active, the player can interact using the destroyer
@@ -66,7 +68,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             // once get key has been pressed, start a timer for how long it is held down
-            timeHeldSpace += Time.deltaTime;
+            timeHeldSpace += (Time.deltaTime * 5);
             depth = (ulong)(timeHeldSpace * 0.5 * 100);
             // depthSlider.value = depth;
         }
@@ -81,36 +83,17 @@ public class PlayerController : MonoBehaviour
     private void DepthChargeHandler(Vector3 playerPos)
     {
         // instantiates new gameobject as one of the gameobjects from the object pooler
-        GameObject dc = ObjectPooler.SharedInstance.DepthChargeManager();
+        GameObject dc = dcManager.GetComponent<ObjectPooler>().ObjectManager();
 
         // if the gameobject is not null, set it to active
         if (dc != null)
         {
-            // TODO:
-            // only pass this once to spawn
-            // do not update x value of depth charge
             dc.transform.position = playerPos;
+            dc.GetComponent<DepthChargeController>().spawnDuration = timeHeldSpace;
 
             dc.SetActive(true);
 
-            Debug.Log("Time Held Space amount is: " + timeHeldSpace);
-
-            float timer = 0;
-
-            if (timer < timeHeldSpace)
-            {
-                timer += Time.deltaTime;
-            }
-
-            // TODO:
-            // figure out why depth charge isn't deactivating once timer is reached
-            if (timer >= timeHeldSpace)
-            {
-                dc.SetActive(false);
-                Debug.Log("Depth Charge Movement is Completed!");
-            }
-
-            // once timer is done, depthCharge is meant to explode
+            Debug.Log("Time Held Space amount is: " + dc.GetComponent<DepthChargeController>().spawnDuration);
         }
     }
 

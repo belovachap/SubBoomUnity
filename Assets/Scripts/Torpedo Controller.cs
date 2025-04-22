@@ -5,16 +5,18 @@ using UnityEngine;
 
 public class TorpedoController : MonoBehaviour
 {
-    public float speed = 0.5f;
+    public const float speed = 0.5f;
 
     private GameObject player;
-    private GameObject submarine;
+    private Vector3 playerPos;
+    private bool check = false;
 
     private float distance;
-    public float duration = 3f;
 
     private AudioSource source;
     [SerializeField] private AudioClip dropClip;
+
+    private GameObject expManager;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +30,8 @@ public class TorpedoController : MonoBehaviour
         Debug.Log("TODO: Play Torpedo Sound!");
 
         player = GameObject.FindGameObjectWithTag("Player");
-        submarine = gameObject.transform.parent.gameObject;
+
+        expManager = GameObject.Find("Explosion Manager");
     }
 
     // Update is called once per frame
@@ -36,30 +39,38 @@ public class TorpedoController : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            distance = CalculateDistance(gameObject.transform.position, player.GetComponent<PlayerController>().GetPlayerPosition());
+            // distance = CalculateDistance(gameObject.transform.position, player.GetComponent<PlayerController>().GetPlayerPosition());
 
-            gameObject.transform.position = Vector3.MoveTowards(
-                                                    gameObject.transform.position,
-                                                    player.GetComponent<PlayerController>().GetPlayerPosition(),
-                                                    (distance/duration) * Time.deltaTime
-                                                    );
+            if (!check)
+            {
+                playerPos = player.GetComponent<PlayerController>().GetPlayerPosition();
+                check = true;
+            }
 
-            /*
-            if (gameObject.transform.position.y >= 0)
+            transform.Translate(player.transform.position.x * Time.deltaTime, player.transform.position.y * Time.deltaTime, 0);
+
+            if (gameObject.transform.position.y >= playerPos.y)
             {
                 Debug.Log("Torpedo Exploded!");
+                check = false;
+
+                // TODO:
+                // create explosion animation here
+
+                GameObject exp = expManager.GetComponent<ObjectPooler>().ObjectManager();
+
+                // if object is NOT active, that means we can use it
+                if (exp != null)
+                {
+                    // sets available explosion effect to active
+                    exp.SetActive(true);
+
+                    //creates explosion at the depth charge position before it deactivates
+                    exp.GetComponent<ExplosionAnimationEffect>().CreateExplosion(gameObject.transform.position);
+                }
+
                 gameObject.SetActive(false);
             }
-            */
-        }
-    }
-
-    private void OnTrigger(Collider other)
-    {
-        if (other.gameObject.name == "Border")
-        {
-            Debug.Log("Torpedo Exploded!");
-            gameObject.SetActive(false);
         }
     }
 

@@ -7,6 +7,7 @@ using static UnityEditor.PlayerSettings;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private GameObject bubbleParticles;
+    private GameObject torpManager;
 
     protected float timeSinceLastTorpedo = 0f;
     protected float timeUntilNextTorpedo;
@@ -23,6 +24,8 @@ public class EnemyController : MonoBehaviour
         // instantiates the depth (y spawn level) and how fast the sub travels
         depth = Random.Range(-4.5f, 2);
         speed = Random.Range(0.5f, 1.5f);
+
+        torpManager = GameObject.Find("Torpedo Manager");
 
         Setup();
     }
@@ -97,7 +100,11 @@ public class EnemyController : MonoBehaviour
 
     void TorpedoHandler(Vector3 subPos)
     {
-        GameObject torp = ObjectPooler.SharedInstance.TorpedoManager();
+        // GameObject torp = ObjectPooler.SharedInstance.TorpedoManager();
+
+        // TODO:
+        // finish object pooler stuff here
+        GameObject torp = torpManager.GetComponent<ObjectPooler>().ObjectManager();
 
         if (torp != null)
         {
