@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6533126421113327424}
+  - component: {fileID: -6620509441385935838}
   - component: {fileID: 1834688025169704520}
   - component: {fileID: 5033793557850300582}
   - component: {fileID: 3600340872729190386}
-  - component: {fileID: -6620509441385935838}
   - component: {fileID: 415646517616026162}
   m_Layer: 0
   m_Name: Explosion
@@ -36,6 +36,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6620509441385935838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4687525501344513936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b58ae6a0638cb49817febca3969128, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionClips:
+  - {fileID: 8300000, guid: 4506ec9268c744d4583d124af2baf018, type: 3}
+  - {fileID: 8300000, guid: a97b99bd3204755b7b4144f13629ee3e, type: 3}
+  - {fileID: 8300000, guid: 3eccdd5f32cd48af8a88c55cae766b25, type: 3}
+  - {fileID: 8300000, guid: b8307194e4baea59b986694b4d0cef55, type: 3}
+  - {fileID: 8300000, guid: bba9404aea1a014478bc5c34bcb5e90e, type: 3}
 --- !u!33 &1834688025169704520
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -107,24 +125,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-6620509441385935838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4687525501344513936}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0b58ae6a0638cb49817febca3969128, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  explosionClips:
-  - {fileID: 8300000, guid: 4506ec9268c744d4583d124af2baf018, type: 3}
-  - {fileID: 8300000, guid: a97b99bd3204755b7b4144f13629ee3e, type: 3}
-  - {fileID: 8300000, guid: 3eccdd5f32cd48af8a88c55cae766b25, type: 3}
-  - {fileID: 8300000, guid: b8307194e4baea59b986694b4d0cef55, type: 3}
-  - {fileID: 8300000, guid: bba9404aea1a014478bc5c34bcb5e90e, type: 3}
 --- !u!82 &415646517616026162
 AudioSource:
   m_ObjectHideFlags: 0
@@ -137,7 +137,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 0
   Mute: 0

@@ -9,29 +9,11 @@ public class ObjectPooler : MonoBehaviour
     public static ObjectPooler SharedInstance;
 
     protected GameObject managerObj;
-    protected GameObject poolerObj;
+    [SerializeField] protected GameObject poolerObj;
 
-    protected int numObjs;
+    [SerializeField] protected int numObjs;
 
-    public List<GameObject> objList { get; protected set; }
-
-    public ObjectPooler()
-    {
-        numObjs = 0;
-        poolerObj = null;
-        objList = new();
-
-        Debug.Log("First constructor called!");
-    }
-
-    public ObjectPooler(int incNum, GameObject incObj, List<GameObject> incList)
-    {
-        numObjs = incNum;
-        poolerObj = incObj;
-        objList = incList;
-
-        Debug.Log("Second constructor called!");
-    }
+    public List<GameObject> objList;
 
     private void Awake()
     {
@@ -61,7 +43,7 @@ public class ObjectPooler : MonoBehaviour
             obj.SetActive(false);
 
             // adds obj to the object list
-            objList[i] = obj;
+            objList.Add(obj);
 
             // adds object to the manager object
             obj.transform.SetParent(managerObj.transform);

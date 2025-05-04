@@ -7,19 +7,16 @@ public class SubmarinePooler : ObjectPooler
 {
     private float timeSinceSubAdded = 0.0f;
 
-    [SerializeField] GameObject subPoolerObj;
-
-    public SubmarinePooler()
+    private void Awake()
     {
-        numObjs = 10;
-        poolerObj = subPoolerObj;
-        objList = new(numObjs);
-
-        new ObjectPooler(numObjs, poolerObj, objList);
+        poolerObj = base.poolerObj;
+        numObjs = base.numObjs;
     }
 
     public override GameObject ObjectManager()
     {
+        objList = base.objList;
+
         // add a new submarine if it's been at least 5 seconds
         timeSinceSubAdded += Time.deltaTime;
 

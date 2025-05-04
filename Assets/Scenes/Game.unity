@@ -294,7 +294,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 262585262}
-  - component: {fileID: 262585264}
   - component: {fileID: 262585265}
   m_Layer: 0
   m_Name: Depth Charge Manager
@@ -318,19 +317,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 466508332}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &262585264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 262585261}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 308330b69d9e3cc4385246551f82f039, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dcPoolerObj: {fileID: 261079894268171960, guid: 120a79701ce99a74cbd5ebbfd9b268c7, type: 3}
 --- !u!114 &262585265
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,6 +329,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c63f99ce98209ea4fb3fd2413889a415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolerObj: {fileID: 261079894268171960, guid: 120a79701ce99a74cbd5ebbfd9b268c7, type: 3}
+  numObjs: 5
+  objList: []
 --- !u!1 &324224483
 GameObject:
   m_ObjectHideFlags: 0
@@ -1252,7 +1241,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1007140186}
-  - component: {fileID: 1007140188}
   - component: {fileID: 1007140189}
   m_Layer: 0
   m_Name: Torpedo Manager
@@ -1276,19 +1264,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 466508332}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1007140188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1007140185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6879a297253312e479da0f82d803de92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  torpPoolerObj: {fileID: 4979077404349424038, guid: 486d17ff80e78304cb2420e5c304efaa, type: 3}
 --- !u!114 &1007140189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1301,6 +1276,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c63f99ce98209ea4fb3fd2413889a415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolerObj: {fileID: 4979077404349424038, guid: 486d17ff80e78304cb2420e5c304efaa, type: 3}
+  numObjs: 10
+  objList: []
 --- !u!1 &1259163150
 GameObject:
   m_ObjectHideFlags: 0
@@ -1959,8 +1937,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1615464659}
-  - component: {fileID: 1615464661}
   - component: {fileID: 1615464662}
+  - component: {fileID: 1615464663}
   m_Layer: 0
   m_Name: Submarine Manager
   m_TagString: Untagged
@@ -1983,19 +1961,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 466508332}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1615464661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1615464658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c237bcbaa7ee2db42a8f66497d82984c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  subPoolerObj: {fileID: 3343165618616635689, guid: abd95741b80320948b8d3e7ded75c393, type: 3}
 --- !u!114 &1615464662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2008,6 +1973,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c63f99ce98209ea4fb3fd2413889a415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolerObj: {fileID: 3343165618616635689, guid: abd95741b80320948b8d3e7ded75c393, type: 3}
+  numObjs: 10
+  objList: []
+--- !u!114 &1615464663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615464658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c237bcbaa7ee2db42a8f66497d82984c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolerObj: {fileID: 0}
+  numObjs: 0
+  objList: []
 --- !u!1 &1625359531
 GameObject:
   m_ObjectHideFlags: 0
@@ -2017,7 +2000,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1625359532}
-  - component: {fileID: 1625359534}
   - component: {fileID: 1625359535}
   m_Layer: 0
   m_Name: Explosion Manager
@@ -2041,19 +2023,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 466508332}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1625359534
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1625359531}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e677cdfd2216054f8596009a9af3764, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  expPoolerObj: {fileID: 4687525501344513936, guid: f935fa58d79854143bf04d4f37531b66, type: 3}
 --- !u!114 &1625359535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2066,6 +2035,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c63f99ce98209ea4fb3fd2413889a415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolerObj: {fileID: 4687525501344513936, guid: f935fa58d79854143bf04d4f37531b66, type: 3}
+  numObjs: 50
+  objList: []
 --- !u!1 &1633580796
 GameObject:
   m_ObjectHideFlags: 0

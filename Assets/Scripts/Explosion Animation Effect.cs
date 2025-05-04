@@ -9,7 +9,7 @@ public class ExplosionAnimationEffect : MonoBehaviour
 
     private AudioSource source;
 
-    // creates a serialized list of all the explosion sounds we have
+    // creates a serialized list of all the explosion sounds
     [SerializeField]
     private AudioClip[] explosionClips = new AudioClip[5];
 
@@ -39,7 +39,7 @@ public class ExplosionAnimationEffect : MonoBehaviour
                 gameObject.SetActive(false);
 
                 gameObject.transform.localScale = new Vector3(1, 1, 1);
-                Debug.Log("Explosion Complete!");
+                // source.clip = explosionClips[UnityEngine.Random.Range(0, 5)];
             }
         }
     }
