@@ -5,7 +5,7 @@ using UnityEngine;
 public class ExplosionAnimationEffect : MonoBehaviour
 {
     private float timer = 0.0f;
-    private float duration = 2.0f;
+    private readonly float duration = 1.5f;
 
     private AudioSource source;
 
@@ -39,7 +39,6 @@ public class ExplosionAnimationEffect : MonoBehaviour
                 gameObject.SetActive(false);
 
                 gameObject.transform.localScale = new Vector3(1, 1, 1);
-                // source.clip = explosionClips[UnityEngine.Random.Range(0, 5)];
             }
         }
     }
