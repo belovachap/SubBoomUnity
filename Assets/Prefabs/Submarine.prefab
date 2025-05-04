@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7281819034511232074}
   - component: {fileID: 5162338571086132418}
   - component: {fileID: 6324984609903216467}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Submarine
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: 4495501035710409411}
   - component: {fileID: 6353992737312883676}
   - component: {fileID: 7738356097487141634}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bubbles
   m_TagString: Untagged
   m_Icon: {fileID: 0}

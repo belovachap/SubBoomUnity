@@ -6,7 +6,6 @@ using System;
 public class SubmarinePooler : ObjectPooler
 {
     private float timeSinceSubAdded = 0.0f;
-
     public override GameObject ObjectManager()
     {
         // add a new submarine if it's been at least 5 seconds
