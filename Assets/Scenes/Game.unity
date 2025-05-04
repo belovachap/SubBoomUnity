@@ -1937,7 +1937,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1615464659}
-  - component: {fileID: 1615464662}
   - component: {fileID: 1615464663}
   m_Layer: 0
   m_Name: Submarine Manager
@@ -1961,21 +1960,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 466508332}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1615464662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1615464658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c63f99ce98209ea4fb3fd2413889a415, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  poolerObj: {fileID: 3343165618616635689, guid: abd95741b80320948b8d3e7ded75c393, type: 3}
-  numObjs: 10
-  objList: []
 --- !u!114 &1615464663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1988,8 +1972,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c237bcbaa7ee2db42a8f66497d82984c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poolerObj: {fileID: 0}
-  numObjs: 0
+  poolerObj: {fileID: 3343165618616635689, guid: abd95741b80320948b8d3e7ded75c393, type: 3}
+  numObjs: 10
   objList: []
 --- !u!1 &1625359531
 GameObject:

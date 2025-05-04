@@ -62,8 +62,6 @@ public class DepthChargeController : MonoBehaviour
                 }
 
                 gameObject.SetActive(false);
-
-                Debug.Log("Depth Charge Movement is Completed!");
             }
         }
     }

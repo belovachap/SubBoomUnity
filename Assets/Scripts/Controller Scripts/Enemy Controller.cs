@@ -22,7 +22,7 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         // instantiates the depth (y spawn level) and how fast the sub travels
-        depth = Random.Range(-4.5f, 2);
+        depth = Random.Range(-4.5f, 1);
         speed = Random.Range(0.5f, 1.5f);
 
         torpManager = GameObject.Find("Torpedo Manager");

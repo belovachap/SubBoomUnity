@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour
         // if the gameobject is not null, set it to active
         if (dc != null)
         {
-            dc.transform.position = playerPos;
+            dc.transform.position = playerPos + new Vector3(0, -0.25f, 0);
             dc.GetComponent<DepthChargeController>().spawnDuration = timeHeldSpace;
 
             dc.SetActive(true);
