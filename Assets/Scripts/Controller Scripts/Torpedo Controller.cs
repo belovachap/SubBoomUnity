@@ -60,6 +60,9 @@ public class TorpedoController : MonoBehaviour
             }
 
             // moves the torpedo to the player location stored in playerPos
+
+            // TODO:
+            // make torpedo movements constant for all torpedos
             torpPos += speed * Time.deltaTime * distance;
             transform.position = torpPos;
 

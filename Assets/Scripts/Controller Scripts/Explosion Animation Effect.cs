@@ -46,4 +46,18 @@ public class ExplosionAnimationEffect : MonoBehaviour
     {
         gameObject.transform.position = spawnPosition;
     }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log("Trigger is going through!     " + other.gameObject.name);
+        if (other.gameObject.name == "Submarine(Clone)")
+        {
+            Debug.Log("Explosion touched Submarine!");
+            other.gameObject.SetActive(false);
+
+            // TODO:
+            // figure out how to reactivate submarine
+            // over a certain amount of time
+        }
+    }
 }
