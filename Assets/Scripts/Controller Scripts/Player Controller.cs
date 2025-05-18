@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private ulong depth = 0;
 
     private bool isGameActive = false;
+    private bool facingRight = true;
 
     public float timePlayed = 0.0f;
     public float timeHeldSpace = 0f;
@@ -29,8 +31,9 @@ public class PlayerController : MonoBehaviour
         timePlayed += Time.deltaTime;
 
         Vector3 pos = gameObject.transform.position;
+        float horInput = Input.GetAxisRaw("Horizontal");
 
-        float movement = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
+        float movement = horInput * speed * Time.deltaTime;
 
         // if the game is active, the player can interact using the destroyer
         if (isGameActive == true)
@@ -38,17 +41,25 @@ public class PlayerController : MonoBehaviour
             // horizontal movement
             transform.Translate(movement, 0, 0);
 
-            // right boundary
-            if (pos.x > 9)
+            // if horizontal movement is right AND player is facing left
+            // OR if horizontal movement is left AND player is facing right
+            // flip player sprite
+            if ((horInput > 0 && !facingRight) || (horInput < 0 && facingRight))
             {
-                pos.x = 9;
+                Flip();
+            }
+
+            // right boundary
+            if (pos.x > 9.5f)
+            {
+                pos.x = 9.5f;
                 gameObject.transform.position = pos;
             }
 
             // left boundary
-            if (pos.x < -9)
+            if (pos.x < -9.5f)
             {
-                pos.x = -9;
+                pos.x = -9.5f;
                 gameObject.transform.position = pos;
             }
 
@@ -101,4 +112,24 @@ public class PlayerController : MonoBehaviour
     {
         return gameObject.transform.position;
     }
+
+    void Flip()
+    {
+        Vector3 flipScale = new Vector3(
+                                       gameObject.transform.localScale.x * -1f,
+                                       gameObject.transform.localScale.y,
+                                       gameObject.transform.localScale.z
+                                       );
+        gameObject.transform.localScale = flipScale;
+
+        if (facingRight)
+        {
+            facingRight = false;
+        }
+        else
+        {
+            facingRight = true;
+        }
+    }
+
 }

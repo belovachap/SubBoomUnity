@@ -6,12 +6,11 @@ public class ExplosionAnimationEffect : MonoBehaviour
 {
     private float timer = 0.0f;
     private readonly float duration = 1.5f;
+    private readonly float scale = 0.75f;
 
     private AudioSource source;
 
-    // creates a serialized list of all the explosion sounds
-    [SerializeField]
-    private AudioClip[] explosionClips = new AudioClip[5];
+    [SerializeField] private AudioClip[] explosionClips = new AudioClip[5];
 
     private void Start()
     {
@@ -29,7 +28,7 @@ public class ExplosionAnimationEffect : MonoBehaviour
             if (timer < duration)
             {
                 timer += Time.deltaTime;
-                gameObject.transform.localScale += new Vector3(Time.deltaTime, Time.deltaTime, 1);
+                gameObject.transform.localScale += new Vector3(Time.deltaTime * scale, Time.deltaTime * scale, 1);
             }
 
             if (timer >= duration)

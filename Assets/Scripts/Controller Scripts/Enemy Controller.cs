@@ -19,7 +19,7 @@ public class EnemyController : MonoBehaviour
     private AudioSource source;
     [SerializeField] private AudioClip sonarClip;
 
-    void Start()
+    void Awake()
     {
         // instantiates the depth (y spawn level) and how fast the sub travels
         depth = Random.Range(-4.5f, 1);
@@ -28,36 +28,6 @@ public class EnemyController : MonoBehaviour
         torpManager = GameObject.Find("Torpedo Manager");
 
         Setup();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // updates current position variable to transform
-        currentPos = gameObject.transform.position;
-
-        // submarine movement
-        currentPos.x += speed * Time.deltaTime;
-
-        // left boundary that teleports enemy to right side
-        if (gameObject.transform.position.x < -13)
-        {
-            currentPos.x = 13;
-        }
-
-        // right boundary that teleports enemy to left side
-        if (gameObject.transform.position.x > 13)
-        {
-            currentPos.x = -13;
-        }
-
-        gameObject.transform.position = currentPos;
-
-        timeSinceLastTorpedo += Time.deltaTime;
-        if (timeSinceLastTorpedo >= timeUntilNextTorpedo)
-        {
-            TorpedoHandler(gameObject.transform.position);
-        }
     }
 
     private void Setup()
@@ -70,20 +40,28 @@ public class EnemyController : MonoBehaviour
 
         timeUntilNextTorpedo = Random.Range(5.0f, 10.0f);
 
-        if (Random.Range(0.0f, 1.0f) >= 0.5f)
+        // will randomly generate either 0, or 1.
+        // if the integer generated is 0, the submarine will move the other way instead
+        if (Random.Range(0, 2) == 0)
         {
             speed *= -1;
 
-            // flips the bubbleParticles positions to be behind the submarine
-            var flipPos = bubbleParticles.transform.position;
-            flipPos.x *= -1f;
-            bubbleParticles.transform.position = flipPos;
-            
+            // flips the submarine localScale to move in the opposite direction
+            Vector3 flipSubScale = new Vector3(
+                                          gameObject.transform.localScale.x * -1f,
+                                          gameObject.transform.localScale.y,
+                                          gameObject.transform.localScale.z
+                                          );
+            gameObject.transform.localScale = flipSubScale;
+
             // flips the bubbleParticles localScale to be behind the submarine
-            var flipScale = bubbleParticles.transform.localScale;
-            flipScale.x *= -1f;
-            flipScale.y *= -1f;
-            bubbleParticles.transform.localScale = flipScale;
+            Vector3 flipBubbleScale = new Vector3(
+                                             bubbleParticles.transform.localScale.x * -1f,
+                                             bubbleParticles.transform.localScale.y,
+                                             bubbleParticles.transform.localScale.z
+                                             );
+            bubbleParticles.transform.localScale = flipBubbleScale;
+            
         }
 
         if (speed < 0)
@@ -98,20 +76,43 @@ public class EnemyController : MonoBehaviour
         gameObject.transform.position = spawnPos;
     }
 
+    void Update()
+    {
+        // updates current position variable to transform
+        currentPos = gameObject.transform.position;
+
+        // submarine movement
+        currentPos.x += speed * Time.deltaTime;
+
+        // left boundary that teleports enemy to right side
+        if (gameObject.transform.position.x < -13f)
+        {
+            currentPos.x = 13f;
+        }
+
+        // right boundary that teleports enemy to left side
+        if (gameObject.transform.position.x > 13f)
+        {
+            currentPos.x = -13f;
+        }
+
+        gameObject.transform.position = currentPos;
+
+        timeSinceLastTorpedo += Time.deltaTime;
+        if (timeSinceLastTorpedo >= timeUntilNextTorpedo)
+        {
+            TorpedoHandler(gameObject.transform.position);
+        }
+    }
+
     void TorpedoHandler(Vector3 subPos)
     {
-        // GameObject torp = ObjectPooler.SharedInstance.TorpedoManager();
-
-        // TODO:
-        // finish object pooler stuff here
         GameObject torp = torpManager.GetComponent<ObjectPooler>().ObjectManager();
 
         if (torp != null)
         {
             torp.transform.position = subPos;
             torp.SetActive(true);
-
-            Debug.Log("Torpedo launched!");
         }
 
         timeSinceLastTorpedo = 0f;
