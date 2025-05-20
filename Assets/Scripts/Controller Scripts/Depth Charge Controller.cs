@@ -57,7 +57,7 @@ public class DepthChargeController : MonoBehaviour
                         exp.SetActive(true);
 
                         //creates explosion at the depth charge position before it deactivates
-                        exp.GetComponent<ExplosionAnimationEffect>().CreateExplosion(gameObject.transform.position);
+                        exp.GetComponent<ExplosionController>().CreateExplosion(gameObject.transform.position);
                     }
                 }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.GameCenter;
 using static UnityEditor.PlayerSettings;
@@ -13,7 +14,9 @@ public class EnemyController : MonoBehaviour
     protected float timeUntilNextTorpedo;
 
     private Vector3 spawnPos, currentPos;
-    private float speed, depth;
+    private float speed = 0, depth;
+    public bool statsChanged = false;
+    private bool facingRight = true;
 
     // plays sonar sound to introduce new submarine
     private AudioSource source;
@@ -21,13 +24,10 @@ public class EnemyController : MonoBehaviour
 
     void Awake()
     {
-        // instantiates the depth (y spawn level) and how fast the sub travels
-        depth = Random.Range(-4.5f, 1);
-        speed = Random.Range(0.5f, 1.5f);
-
         torpManager = GameObject.Find("Torpedo Manager");
 
-        Setup();
+        if (!statsChanged)
+            Setup();
     }
 
     private void Setup()
@@ -38,31 +38,20 @@ public class EnemyController : MonoBehaviour
         source.clip = sonarClip;
         source.Play();
 
-        timeUntilNextTorpedo = Random.Range(5.0f, 10.0f);
+        // instantiates the depth (y spawn level) and how fast the sub travels
+        depth = Random.Range(-4.5f, 1);
 
-        // will randomly generate either 0, or 1.
-        // if the integer generated is 0, the submarine will move the other way instead
+        // sets the speed
+        speed = Random.Range(0.5f, 1.5f);
+
+        // rolls between 0 or 1, if 0, reverse submarine
         if (Random.Range(0, 2) == 0)
         {
-            speed *= -1;
-
-            // flips the submarine localScale to move in the opposite direction
-            Vector3 flipSubScale = new Vector3(
-                                          gameObject.transform.localScale.x * -1f,
-                                          gameObject.transform.localScale.y,
-                                          gameObject.transform.localScale.z
-                                          );
-            gameObject.transform.localScale = flipSubScale;
-
-            // flips the bubbleParticles localScale to be behind the submarine
-            Vector3 flipBubbleScale = new Vector3(
-                                             bubbleParticles.transform.localScale.x * -1f,
-                                             bubbleParticles.transform.localScale.y,
-                                             bubbleParticles.transform.localScale.z
-                                             );
-            bubbleParticles.transform.localScale = flipBubbleScale;
-            
+            speed *= -1f;
+            Flip();
         }
+
+        timeUntilNextTorpedo = Random.Range(5.0f, 10.0f);
 
         if (speed < 0)
         {
@@ -74,6 +63,32 @@ public class EnemyController : MonoBehaviour
         }
 
         gameObject.transform.position = spawnPos;
+
+        statsChanged = true;
+    }
+
+    void Flip()
+    {
+        // flips the submarine localScale to move in the opposite direction
+        transform.localScale = new Vector3(
+            gameObject.transform.localScale.x * -1f,
+            gameObject.transform.localScale.y,
+            gameObject.transform.localScale.z);
+
+        // flips the bubbleParticles localScale to be behind the submarine
+        bubbleParticles.transform.localScale = new Vector3(
+            bubbleParticles.transform.localScale.x * -1f,
+            bubbleParticles.transform.localScale.y,
+            bubbleParticles.transform.localScale.z);
+
+        if (facingRight)
+        {
+            facingRight = false;
+        }
+        else
+        {
+            facingRight = true;
+        }
     }
 
     void Update()
@@ -94,6 +109,14 @@ public class EnemyController : MonoBehaviour
         if (gameObject.transform.position.x > 13f)
         {
             currentPos.x = -13f;
+        }
+
+        // if horizontal movement is right AND sub is facing left
+        // OR if horizontal movement is left AND sub is facing right
+        // flip sub sprite
+        if ((speed > 0 && !facingRight) || (speed < 0 && facingRight))
+        {
+            Flip();
         }
 
         gameObject.transform.position = currentPos;
@@ -117,5 +140,16 @@ public class EnemyController : MonoBehaviour
 
         timeSinceLastTorpedo = 0f;
         timeUntilNextTorpedo = Random.Range(5.0f, 10.0f);
+    }
+
+    public void WaitToRespawn()
+    {
+        if (!gameObject.activeSelf)
+        {
+            if (!statsChanged)
+                Setup();
+
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 0);
+        }
     }
 }

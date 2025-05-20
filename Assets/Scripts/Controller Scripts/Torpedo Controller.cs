@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class TorpedoController : MonoBehaviour
 {
-    public const float speed = 0.3f;
+    public const float speed = 1.25f;
     private float angle;
 
     private GameObject expManager, player;
 
-    private Vector3 torpPos, playerPos, distance, direction;
+    private Vector3 torpPos, playerPos, direction;
 
     private bool check = false;
 
@@ -44,9 +44,6 @@ public class TorpedoController : MonoBehaviour
             {
                 playerPos = player.transform.position;
 
-                // vector of the distance between the player position and torpedo position
-                distance = (playerPos - torpPos);
-
                 // gets transform of torpedo and transforms it with the local player position
                 direction = transform.InverseTransformPoint(playerPos);
 
@@ -59,14 +56,11 @@ public class TorpedoController : MonoBehaviour
                 check = true;
             }
 
-            // moves the torpedo to the player location stored in playerPos
+            // moves the torpedo to the player location, which is stored in playerPos
+            var step = speed * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, playerPos, step);
 
-            // TODO:
-            // make torpedo movements constant for all torpedos
-            torpPos += speed * Time.deltaTime * distance;
-            transform.position = torpPos;
-
-            // if the torpPos Y is the same as the submarines, then the torpedo will explode
+            // if the torpPos Y is the same as the player's, then the torpedo will explode
             if (torpPos.y >= playerPos.y)
             {
                 check = false;
@@ -80,7 +74,7 @@ public class TorpedoController : MonoBehaviour
                     exp.SetActive(true);
 
                     //creates explosion at the depth charge position before it deactivates
-                    exp.GetComponent<ExplosionAnimationEffect>().CreateExplosion(torpPos);
+                    exp.GetComponent<ExplosionController>().CreateExplosion(torpPos);
                 }
 
                 gameObject.SetActive(false);

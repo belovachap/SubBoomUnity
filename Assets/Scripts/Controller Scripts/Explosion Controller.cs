@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExplosionAnimationEffect : MonoBehaviour
+public class ExplosionController : MonoBehaviour
 {
     private float timer = 0.0f;
     private readonly float duration = 1.5f;
@@ -12,15 +12,18 @@ public class ExplosionAnimationEffect : MonoBehaviour
 
     [SerializeField] private AudioClip[] explosionClips = new AudioClip[5];
 
+    private SubmarinePooler subPooler;
+
     private void Start()
     {
+        subPooler = GameObject.Find("Submarine Manager").GetComponent<SubmarinePooler>();
+
         source = gameObject.GetComponent<AudioSource>();
         source.clip = explosionClips[UnityEngine.Random.Range(0, 5)];
 
         source.Play();
     }
 
-    // maybe add another variable to the method that will grab the current explodeCharge's collider component?
     private void Update()
     {
         if (gameObject.activeSelf)
@@ -49,15 +52,23 @@ public class ExplosionAnimationEffect : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Trigger is going through!     " + other.gameObject.name);
         if (other.gameObject.name == "Submarine(Clone)")
         {
-            Debug.Log("Explosion touched Submarine!");
             other.gameObject.SetActive(false);
 
             // TODO:
-            // figure out how to reactivate submarine
-            // over a certain amount of time
+            // figure out how to move submarine to outside the map
+            // once deactivated and stay there for a certain amount of time
+            // before reactivating
+            other.gameObject.GetComponent<EnemyController>().statsChanged = false;
+            other.gameObject.GetComponent<EnemyController>().WaitToRespawn();
         }
+
+        /*
+        if (other.gameObject.name == "Player")
+        {
+            other.gameObject.SetActive(false);
+        }
+        */
     }
 }

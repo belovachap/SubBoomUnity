@@ -28,16 +28,16 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        timePlayed += Time.deltaTime;
-
-        Vector3 pos = gameObject.transform.position;
-        float horInput = Input.GetAxisRaw("Horizontal");
-
-        float movement = horInput * speed * Time.deltaTime;
-
         // if the game is active, the player can interact using the destroyer
         if (isGameActive == true)
         {
+            timePlayed += Time.deltaTime;
+
+            Vector3 pos = gameObject.transform.position;
+            float horInput = Input.GetAxisRaw("Horizontal");
+
+            float movement = horInput * speed * Time.deltaTime;
+
             // horizontal movement
             transform.Translate(movement, 0, 0);
 
@@ -65,6 +65,13 @@ public class PlayerController : MonoBehaviour
 
             DepthChargeInputs(pos);
         }
+
+        if (gameObject.activeInHierarchy == false && isGameActive)
+        {
+            isGameActive = false;
+            // TODO:
+            // call game over screen here
+        }
     }
 
     private void DepthChargeInputs(Vector3 playerPos)
@@ -74,6 +81,9 @@ public class PlayerController : MonoBehaviour
         {
             // reset timer
             timeHeldSpace = 0;
+
+            // TO DO:
+            // set depth charge movement to player movement
         }
 
         if (Input.GetKey(KeyCode.Space))
@@ -82,12 +92,18 @@ public class PlayerController : MonoBehaviour
             timeHeldSpace += (Time.deltaTime * 5);
             depth = (ulong)(timeHeldSpace * 0.5 * 100);
             // depthSlider.value = depth;
+
+            // TODO:
+            // move depth charge downwards
         }
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
             // once get key up is true, timer stops and we use that time to add to the y-pos of depth charge
             DepthChargeHandler(playerPos);
+
+            // TODO:
+            // deactivate depth charge
         }
     }
 
@@ -103,8 +119,6 @@ public class PlayerController : MonoBehaviour
             dc.GetComponent<DepthChargeController>().spawnDuration = timeHeldSpace;
 
             dc.SetActive(true);
-
-            Debug.Log("Time Held Space amount is: " + dc.GetComponent<DepthChargeController>().spawnDuration);
         }
     }
 

@@ -1491,7 +1491,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolerObj: {fileID: 124561689438576375, guid: 56bcc1d2664049645bab8170c336c629, type: 3}
-  numObjs: 10
+  numObjs: 3
   objList: []
 --- !u!1 &1625359531
 GameObject:
