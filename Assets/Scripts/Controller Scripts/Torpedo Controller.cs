@@ -10,7 +10,7 @@ public class TorpedoController : MonoBehaviour
 
     private GameObject expManager, player;
 
-    private Vector3 torpPos, playerPos, direction;
+    private Vector3 playerPos, direction;
 
     private bool check = false;
 
@@ -38,8 +38,6 @@ public class TorpedoController : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            torpPos = transform.position;
-
             if (!check)
             {
                 playerPos = player.transform.position;
@@ -61,7 +59,7 @@ public class TorpedoController : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, playerPos, step);
 
             // if the torpPos Y is the same as the player's, then the torpedo will explode
-            if (torpPos.y >= playerPos.y)
+            if (transform.position.y >= playerPos.y)
             {
                 check = false;
 
@@ -74,7 +72,7 @@ public class TorpedoController : MonoBehaviour
                     exp.SetActive(true);
 
                     //creates explosion at the depth charge position before it deactivates
-                    exp.GetComponent<ExplosionController>().CreateExplosion(torpPos);
+                    exp.GetComponent<ExplosionController>().CreateExplosion(transform.position);
                 }
 
                 gameObject.SetActive(false);

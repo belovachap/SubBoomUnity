@@ -6,18 +6,17 @@ using static UnityEditor.PlayerSettings;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private GameObject depthCharge;
+    [SerializeField] private GameObject dcDisplay;
     [SerializeField] private GameObject dcManager;
 
-    private ulong depth = 0;
-
-    private bool isGameActive = false;
+    public bool isGameActive = false;
     private bool facingRight = true;
-
-    public float timePlayed = 0.0f;
-    public float timeHeldSpace = 0f;
+    private float timeHeldSpace = 0f;
 
     private const float speed = 3f;
+
+    private const float dcSpeed = 0.8f;
+    private Vector3 dcDistance;
 
     // Start is called before the first frame update
     void Start()
@@ -31,8 +30,6 @@ public class PlayerController : MonoBehaviour
         // if the game is active, the player can interact using the destroyer
         if (isGameActive == true)
         {
-            timePlayed += Time.deltaTime;
-
             Vector3 pos = gameObject.transform.position;
             float horInput = Input.GetAxisRaw("Horizontal");
 
@@ -66,11 +63,9 @@ public class PlayerController : MonoBehaviour
             DepthChargeInputs(pos);
         }
 
-        if (gameObject.activeInHierarchy == false && isGameActive)
+        if (!gameObject.activeInHierarchy && isGameActive)
         {
             isGameActive = false;
-            // TODO:
-            // call game over screen here
         }
     }
 
@@ -82,19 +77,20 @@ public class PlayerController : MonoBehaviour
             // reset timer
             timeHeldSpace = 0;
 
-            // TO DO:
-            // set depth charge movement to player movement
+            // activates depth charge to be visible
+            dcDisplay.SetActive(true);
         }
 
         if (Input.GetKey(KeyCode.Space))
         {
             // once get key has been pressed, start a timer for how long it is held down
-            timeHeldSpace += (Time.deltaTime * 5);
-            depth = (ulong)(timeHeldSpace * 0.5 * 100);
-            // depthSlider.value = depth;
+            timeHeldSpace += Time.deltaTime;
 
-            // TODO:
-            // move depth charge downwards
+            // create formula for the depth charge distance travelled to send to the actual depth charge
+            dcDistance = dcSpeed * Time.deltaTime * Vector3.down;
+
+            // moves depth charge vertically downwards
+            dcDisplay.transform.Translate(dcDistance);
         }
 
         if (Input.GetKeyUp(KeyCode.Space))
@@ -102,8 +98,9 @@ public class PlayerController : MonoBehaviour
             // once get key up is true, timer stops and we use that time to add to the y-pos of depth charge
             DepthChargeHandler(playerPos);
 
-            // TODO:
             // deactivate depth charge
+            dcDisplay.SetActive(false);
+            dcDisplay.transform.position = transform.position;
         }
     }
 
@@ -116,25 +113,19 @@ public class PlayerController : MonoBehaviour
         if (dc != null)
         {
             dc.transform.position = playerPos + new Vector3(0, -0.25f, 0);
-            dc.GetComponent<DepthChargeController>().spawnDuration = timeHeldSpace;
+            dc.GetComponent<DepthChargeController>().SetSpawnDuration(timeHeldSpace);
+            dc.GetComponent<DepthChargeController>().SetDistance(dcDistance);
 
             dc.SetActive(true);
         }
     }
 
-    public Vector3 GetPlayerPosition()
-    {
-        return gameObject.transform.position;
-    }
-
     void Flip()
     {
-        Vector3 flipScale = new Vector3(
-                                       gameObject.transform.localScale.x * -1f,
-                                       gameObject.transform.localScale.y,
-                                       gameObject.transform.localScale.z
-                                       );
-        gameObject.transform.localScale = flipScale;
+        gameObject.transform.localScale = new Vector3(
+            gameObject.transform.localScale.x * -1f,
+            gameObject.transform.localScale.y,
+            gameObject.transform.localScale.z);
 
         if (facingRight)
         {
