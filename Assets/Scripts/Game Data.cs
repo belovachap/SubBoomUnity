@@ -48,7 +48,8 @@ public class GameData : MonoBehaviour
 
     public void Save()
     {
-        GameData data = new();
+        SaveData data = new SaveData();
+
         data.totalGamesPlayed = totalGamesPlayed;
         data.totalSecondsPlayed = totalSecondsPlayed;
 
@@ -57,12 +58,18 @@ public class GameData : MonoBehaviour
 
         data.highScore = highScore;
         data.highScoreDateTime = highScoreDateTime;
+
+        string jsonData = JsonUtility.ToJson(data);
+
+        File.WriteAllText(Application.persistentDataPath + "gamedata.json", jsonData);
+
+        /*
         string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
         try
         {
             Directory.CreateDirectory(Application.persistentDataPath);
             string jsonData = JsonUtility.ToJson(data, true);
-            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            using (FileStream stream = new(filePath, FileMode.Create))
             {
                 using (StreamWriter writer = new(stream))
                 {
@@ -75,10 +82,29 @@ public class GameData : MonoBehaviour
         {
             Debug.LogError("Error saving GameData object: " + e);
         }
+        */
     }
 
     public void Load()
     {
+        string path = Application.persistentDataPath + "gamedata.json";
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            totalGamesPlayed = data.totalGamesPlayed;
+            totalSecondsPlayed = data.totalSecondsPlayed;
+
+            lastScore = data.lastScore;
+            lastScoreDateTime = data.lastScoreDateTime;
+
+            highScore = data.highScore;
+            highScoreDateTime = data.highScoreDateTime;
+        }
+
+        /*
         string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
 
         try
@@ -107,5 +133,6 @@ public class GameData : MonoBehaviour
         {
             Debug.Log("Error loading GameData object: " + e);
         }
+        */
     }
 }

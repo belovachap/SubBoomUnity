@@ -68,18 +68,14 @@ public class ExplosionController : MonoBehaviour
             score += 10;
             guiManager.AddScore(score);
         }
-        else if (!other.gameObject.CompareTag("Player") && !other.gameObject.CompareTag("Enemy"))
-        {
-
-        }
-
-        /*
-        if (other.gameObject.CompareTag("Player"))
+        else if (other.gameObject.CompareTag("Player"))
         {
             other.gameObject.SetActive(false);
             guiManager.GameOverScreen();
         }
-        */
+        else if (!other.gameObject.CompareTag("Player") && !other.gameObject.CompareTag("Enemy"))
+        {
 
+        }
     }
 }

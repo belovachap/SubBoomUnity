@@ -3,49 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 
+// Sets the script to be executed later than all default scripts
+// This is helpful for UI, since other things may need to be initialized before setting the UI
+[DefaultExecutionOrder(1000)]
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField]
-    Text gamesPlayedText;
+    [SerializeField] private Text gamesPlayedText, secondsPlayedText, lastScoreText, highScoreText;
 
-    [SerializeField]
-    Text secondsPlayedText;
-
-    [SerializeField]
-    Text lastScoreText;
-
-    [SerializeField]
-    Text highScoreText;
+    // GameData gd = GameData.Instance;
 
     public void Start() {
-        GameData gd = GameDataFileHandler.Load();
 
-        gamesPlayedText.text = "Games Played: " + gd.totalGamesPlayed.ToString();
-        secondsPlayedText.text = "Seconds Played: " + gd.totalSecondsPlayed.ToString();
+        gamesPlayedText.text = "Games Played: " + GameData.Instance.totalGamesPlayed.ToString();
+        secondsPlayedText.text = "Seconds Played: " + GameData.Instance.totalSecondsPlayed.ToString();
 
-        if (gd.lastScoreDateTime == "") {
+        if (GameData.Instance.lastScoreDateTime == "")
+        {
             lastScoreText.text = "";
         }
-        else {
-            lastScoreText.text = "Last Score: " + gd.lastScore.ToString() + " on " + gd.lastScoreDateTime;
+        else
+        {
+            lastScoreText.text = "Last Score: " + GameData.Instance.lastScore.ToString() + " on " + GameData.Instance.lastScoreDateTime;
         }
 
-        if (gd.highScoreDateTime == "") {
+        if (GameData.Instance.highScoreDateTime == "")
+        {
             highScoreText.text = "";
         }
-        else {
-            highScoreText.text = "High Score: " + gd.highScore.ToString() + " on " + gd.highScoreDateTime;
+        else
+        {
+            highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString() + " on " + GameData.Instance.highScoreDateTime;
         }
     }
 
     public void QuitButtonClick()
     {
-        Application.Quit();
+        GameData.Instance.Save();
+
+        #if UNITY_EDITOR
+            EditorApplication.ExitPlaymode();
+        #else
+            Application.Quit();
+        #endif
     }
 
     public void StartButtonClick()
     {
-        SceneManager.LoadScene("SubBoomScene", LoadSceneMode.Single);
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 }

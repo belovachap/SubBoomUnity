@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ public class GUIManager : MonoBehaviour
 
     private ulong score = 0;
     private float timePlayed = 0.0f;
+
+    // GameData gd = GameData.Instance;
 
     private void Start()
     {
@@ -46,38 +49,40 @@ public class GUIManager : MonoBehaviour
 
     public void RestartClick()
     {
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public void MainMenuClick()
     {
-        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
-    void SaveGameStats()
+    private void SaveGameStats()
     {
-        GameData gd = GameDataFileHandler.Load();
         DateTime now = DateTime.Now;
 
-        gd.totalGamesPlayed += 1;
-        gd.totalSecondsPlayed += (ulong)timePlayed;
-        gd.lastScore = score;
-        gd.lastScoreDateTime = now.ToString();
+        GameData.Instance.totalGamesPlayed += 1;
+        GameData.Instance.totalSecondsPlayed += (ulong)timePlayed;
+        GameData.Instance.lastScore = score;
+        GameData.Instance.lastScoreDateTime = now.ToString();
 
-        if (score >= gd.highScore)
+        if (score >= GameData.Instance.highScore)
         {
-            gd.highScore = score;
-            gd.highScoreDateTime = now.ToString();
+            GameData.Instance.highScore = score;
+            GameData.Instance.highScoreDateTime = now.ToString();
         }
 
-        GameDataFileHandler.Save(gd);
+        GameData.Instance.Save();
     }
 
-    void OnApplicationQuit()
+    public void QuitButtonClick()
     {
-        if (playerController.isGameActive)
-        {
-            SaveGameStats();
-        }
+        SaveGameStats();
+
+        #if UNITY_EDITOR
+             EditorApplication.ExitPlaymode();
+        #else
+             Application.Quit();
+        #endif
     }
 }
