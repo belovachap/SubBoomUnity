@@ -6,19 +6,12 @@ using UnityEngine.Pool;
 
 public class ObjectPooler : MonoBehaviour
 {
-    public static ObjectPooler SharedInstance;
-
     protected GameObject managerObj;
     [SerializeField] protected GameObject poolerObj;
 
     [SerializeField] protected int numObjs;
 
     public List<GameObject> objList;
-
-    private void Awake()
-    {
-        SharedInstance = this;
-    }
 
     private void Start()
     {

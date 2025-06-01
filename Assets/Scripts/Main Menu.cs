@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 // Sets the script to be executed later than all default scripts
 // This is helpful for UI, since other things may need to be initialized before setting the UI
@@ -12,9 +15,8 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Text gamesPlayedText, secondsPlayedText, lastScoreText, highScoreText;
 
-    // GameData gd = GameData.Instance;
-
     public void Start() {
+        GameData.Instance.Load();
 
         gamesPlayedText.text = "Games Played: " + GameData.Instance.totalGamesPlayed.ToString();
         secondsPlayedText.text = "Seconds Played: " + GameData.Instance.totalSecondsPlayed.ToString();
@@ -38,6 +40,11 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    public void StartButtonClick()
+    {
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
+    }
+
     public void QuitButtonClick()
     {
         GameData.Instance.Save();
@@ -47,10 +54,5 @@ public class MainMenu : MonoBehaviour
         #else
             Application.Quit();
         #endif
-    }
-
-    public void StartButtonClick()
-    {
-        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 }

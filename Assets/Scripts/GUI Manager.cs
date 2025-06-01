@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,6 +10,7 @@ using UnityEngine.UI;
 public class GUIManager : MonoBehaviour
 {
     [SerializeField] private Text scoreText;
+    [SerializeField] private Text highScoreText;
 
     [SerializeField] private GameObject gameOverScreen;
     [SerializeField] private PlayerController playerController;
@@ -22,6 +24,8 @@ public class GUIManager : MonoBehaviour
     {
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
         gameOverScreen.SetActive(false);
+
+        highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString();
     }
 
     private void Update()
@@ -36,6 +40,11 @@ public class GUIManager : MonoBehaviour
     {
         score = (ulong)incAmount;
         scoreText.text = "Score: " + score.ToString();
+
+        if (score >= GameData.Instance.highScore)
+        {
+            highScoreText.text = "High Score: " + score.ToString();
+        }
     }
 
     public void GameOverScreen()
@@ -44,6 +53,8 @@ public class GUIManager : MonoBehaviour
         {
             gameOverScreen.SetActive(true);
             playerController.isGameActive = false;
+
+            SaveGameStats();
         }
     }
 
@@ -63,6 +74,7 @@ public class GUIManager : MonoBehaviour
 
         GameData.Instance.totalGamesPlayed += 1;
         GameData.Instance.totalSecondsPlayed += (ulong)timePlayed;
+
         GameData.Instance.lastScore = score;
         GameData.Instance.lastScoreDateTime = now.ToString();
 
@@ -77,8 +89,6 @@ public class GUIManager : MonoBehaviour
 
     public void QuitButtonClick()
     {
-        SaveGameStats();
-
         #if UNITY_EDITOR
              EditorApplication.ExitPlaymode();
         #else

@@ -59,9 +59,9 @@ public class GameData : MonoBehaviour
         data.highScore = highScore;
         data.highScoreDateTime = highScoreDateTime;
 
-        string jsonData = JsonUtility.ToJson(data);
+        string json = JsonUtility.ToJson(data);
 
-        File.WriteAllText(Application.persistentDataPath + "gamedata.json", jsonData);
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
 
         /*
         string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
@@ -87,7 +87,7 @@ public class GameData : MonoBehaviour
 
     public void Load()
     {
-        string path = Application.persistentDataPath + "gamedata.json";
+        string path = Application.persistentDataPath + "/savefile.json";
 
         if (File.Exists(path))
         {
