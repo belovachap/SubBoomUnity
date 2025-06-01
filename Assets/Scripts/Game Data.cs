@@ -2,54 +2,137 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditorInternal;
 using UnityEngine;
 
-public class GameData {
+public class GameData : MonoBehaviour
+{
     public ulong totalGamesPlayed = 0;
     public ulong totalSecondsPlayed = 0;
+
     public ulong lastScore = 0;
     public string lastScoreDateTime = "";
+
     public ulong highScore = 0;
     public string highScoreDateTime = "";
-}
 
-static class GameDataFileHandler {
-    public static GameData Load() {
-        GameData gd = null;
-        string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
-        try {
-            string jsonData = "";
-            using (FileStream stream = new FileStream(filePath, FileMode.Open)) {
-                using (StreamReader reader = new StreamReader(stream)) {
-                    jsonData = reader.ReadToEnd();
-                }
-            }
+    public static GameData Instance { get; set; }
 
-            gd = JsonUtility.FromJson<GameData>(jsonData);
-        }
-        catch (Exception e) {
-            Debug.Log("Error loading GameData object: " + e);
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
-        if(gd == null) {
-            gd = new GameData();
-        }
-        return gd;
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        Load();
     }
 
-    public static void Save(GameData gd) {
+
+    [System.Serializable]
+    class SaveData
+    {
+        public ulong totalGamesPlayed = 0;
+        public ulong totalSecondsPlayed = 0;
+
+        public ulong lastScore = 0;
+        public string lastScoreDateTime = "";
+
+        public ulong highScore = 0;
+        public string highScoreDateTime = "";
+    }
+
+    public void Save()
+    {
+        SaveData data = new SaveData();
+
+        data.totalGamesPlayed = totalGamesPlayed;
+        data.totalSecondsPlayed = totalSecondsPlayed;
+
+        data.lastScore = lastScore;
+        data.lastScoreDateTime = lastScoreDateTime;
+
+        data.highScore = highScore;
+        data.highScoreDateTime = highScoreDateTime;
+
+        string json = JsonUtility.ToJson(data);
+
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+
+        /*
         string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
-        try {
+        try
+        {
             Directory.CreateDirectory(Application.persistentDataPath);
-            string jsonData = JsonUtility.ToJson(gd, true);
-            using (FileStream stream = new FileStream(filePath, FileMode.Create)) {
-                using (StreamWriter writer = new StreamWriter(stream)) {
+            string jsonData = JsonUtility.ToJson(data, true);
+            using (FileStream stream = new(filePath, FileMode.Create))
+            {
+                using (StreamWriter writer = new(stream))
+                {
                     writer.Write(jsonData);
                 }
             }
         }
-        catch (Exception e) {
+
+        catch (Exception e)
+        {
             Debug.LogError("Error saving GameData object: " + e);
         }
+        */
+    }
+
+    public void Load()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            totalGamesPlayed = data.totalGamesPlayed;
+            totalSecondsPlayed = data.totalSecondsPlayed;
+
+            lastScore = data.lastScore;
+            lastScoreDateTime = data.lastScoreDateTime;
+
+            highScore = data.highScore;
+            highScoreDateTime = data.highScoreDateTime;
+        }
+
+        /*
+        string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
+
+        try
+        {
+            string jsonData = "";
+            using (FileStream stream = new(filePath, FileMode.Open))
+            {
+                using (StreamReader reader = new(stream))
+                {
+                    jsonData = reader.ReadToEnd();
+                }
+            }
+
+            GameData data = JsonUtility.FromJson<GameData>(jsonData);
+            totalGamesPlayed = data.totalGamesPlayed;
+            totalSecondsPlayed = data.totalSecondsPlayed;
+
+            lastScore = data.lastScore;
+            lastScoreDateTime = data.lastScoreDateTime;
+
+            highScore = data.highScore;
+            highScoreDateTime = data.highScoreDateTime;
+        }
+         
+        catch (Exception e)
+        {
+            Debug.Log("Error loading GameData object: " + e);
+        }
+        */
     }
 }

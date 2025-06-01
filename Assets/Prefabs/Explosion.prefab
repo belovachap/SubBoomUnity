@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 9107571534312733113}
   - component: {fileID: 75820634442665287}
   - component: {fileID: -8758327565782727377}
-  - component: {fileID: 4461431204050739768}
+  - component: {fileID: -1250752171772228963}
   m_Layer: 0
   m_Name: Explosion
-  m_TagString: Untagged
+  m_TagString: Explosion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -237,7 +237,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!50 &4461431204050739768
+--- !u!50 &-1250752171772228963
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -262,5 +262,5 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0

@@ -21,6 +21,7 @@ public class SubmarinePooler : ObjectPooler
                 if (!objList[i].activeInHierarchy)
                 {
                     objList[i].SetActive(true);
+                    objList[i].GetComponent<EnemyController>().PlaySpawnSound();
                     break;
                 }
             }

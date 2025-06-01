@@ -5,11 +5,9 @@ using UnityEngine;
 
 public class DepthChargeController : MonoBehaviour
 {
-    private Rigidbody rb;
-
-    private const float speed = 0.6f;
     private float timer = 0;
-    public float spawnDuration = 0;
+    private float spawnDuration = 0;
+    private Vector3 distance;
 
     private AudioSource source;
     [SerializeField] private AudioClip dropClip;
@@ -18,8 +16,6 @@ public class DepthChargeController : MonoBehaviour
 
     void Start()
     {
-        rb = gameObject.GetComponent<Rigidbody>();
-
         source = gameObject.GetComponent<AudioSource>();
         source.clip = dropClip;
         source.Play();
@@ -32,7 +28,7 @@ public class DepthChargeController : MonoBehaviour
         if (gameObject.activeSelf)
         {
             // vertical movement of depth charge
-            transform.Translate(speed * Time.deltaTime * Vector3.down, Space.World);
+            transform.Translate(distance);
 
             if (timer < spawnDuration)
             {
@@ -45,7 +41,6 @@ public class DepthChargeController : MonoBehaviour
 
                 // TODO:
                 // figure out why explosion animations are only playing SOMETIMES
-
                 for (int i = 0; i < expManager.GetComponent<ObjectPooler>().objList.Count; i++)
                 {
                     GameObject exp = expManager.GetComponent<ObjectPooler>().ObjectManager();
@@ -64,5 +59,15 @@ public class DepthChargeController : MonoBehaviour
                 gameObject.SetActive(false);
             }
         }
+    }
+
+    public void SetSpawnDuration(float incTimeHeld)
+    {
+        spawnDuration = incTimeHeld;
+    }
+
+    public void SetDistance(Vector3 incDistance)
+    {
+        distance = incDistance;
     }
 }

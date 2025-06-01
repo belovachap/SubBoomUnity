@@ -10,11 +10,15 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private GameObject bubbleParticles;
     private GameObject torpManager;
 
+    private PlayerController playerController;
+
     protected float timeSinceLastTorpedo = 0f;
     protected float timeUntilNextTorpedo;
 
     private Vector3 spawnPos, currentPos;
+
     private float speed = 0, depth;
+
     public bool statsChanged = false;
     private bool facingRight = true;
 
@@ -25,6 +29,10 @@ public class EnemyController : MonoBehaviour
     void Awake()
     {
         torpManager = GameObject.Find("Torpedo Manager");
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+
+        source = gameObject.GetComponent<AudioSource>();
+        source.clip = sonarClip;
 
         if (!statsChanged)
             Setup();
@@ -32,12 +40,6 @@ public class EnemyController : MonoBehaviour
 
     private void Setup()
     {
-        // sets up the audio source and audio clip components
-        // so that when the enemy spawns, a sonar sound will play
-        source = gameObject.GetComponent<AudioSource>();
-        source.clip = sonarClip;
-        source.Play();
-
         // instantiates the depth (y spawn level) and how fast the sub travels
         depth = Random.Range(-4.5f, 1);
 
@@ -78,7 +80,7 @@ public class EnemyController : MonoBehaviour
         // flips the bubbleParticles localScale to be behind the submarine
         bubbleParticles.transform.localScale = new Vector3(
             bubbleParticles.transform.localScale.x * -1f,
-            bubbleParticles.transform.localScale.y,
+            bubbleParticles.transform.localScale.y * -1f,
             bubbleParticles.transform.localScale.z);
 
         if (facingRight)
@@ -93,38 +95,41 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        // updates current position variable to transform
-        currentPos = gameObject.transform.position;
-
-        // submarine movement
-        currentPos.x += speed * Time.deltaTime;
-
-        // left boundary that teleports enemy to right side
-        if (gameObject.transform.position.x < -13f)
+        if (playerController.isGameActive && gameObject.activeSelf)
         {
-            currentPos.x = 13f;
-        }
+            // updates current position variable to transform
+            currentPos = gameObject.transform.position;
 
-        // right boundary that teleports enemy to left side
-        if (gameObject.transform.position.x > 13f)
-        {
-            currentPos.x = -13f;
-        }
+            // submarine movement
+            currentPos.x += speed * Time.deltaTime;
 
-        // if horizontal movement is right AND sub is facing left
-        // OR if horizontal movement is left AND sub is facing right
-        // flip sub sprite
-        if ((speed > 0 && !facingRight) || (speed < 0 && facingRight))
-        {
-            Flip();
-        }
+            // left boundary that teleports enemy to right side
+            if (gameObject.transform.position.x < -13f)
+            {
+                currentPos.x = 13f;
+            }
 
-        gameObject.transform.position = currentPos;
+            // right boundary that teleports enemy to left side
+            if (gameObject.transform.position.x > 13f)
+            {
+                currentPos.x = -13f;
+            }
 
-        timeSinceLastTorpedo += Time.deltaTime;
-        if (timeSinceLastTorpedo >= timeUntilNextTorpedo)
-        {
-            TorpedoHandler(gameObject.transform.position);
+            // if horizontal movement is right AND sub is facing left
+            // OR if horizontal movement is left AND sub is facing right
+            // flip sub sprite
+            if ((speed > 0 && !facingRight) || (speed < 0 && facingRight))
+            {
+                Flip();
+            }
+
+            gameObject.transform.position = currentPos;
+
+            timeSinceLastTorpedo += Time.deltaTime;
+            if (timeSinceLastTorpedo >= timeUntilNextTorpedo)
+            {
+                TorpedoHandler(gameObject.transform.position);
+            }
         }
     }
 
@@ -150,6 +155,16 @@ public class EnemyController : MonoBehaviour
                 Setup();
 
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 0);
+        }
+    }
+
+    public void PlaySpawnSound()
+    {
+        // sets up the audio source and audio clip components
+        // so that when the enemy spawns, a sonar sound will play
+        if (playerController.isGameActive)
+        {
+            source.Play();
         }
     }
 }
