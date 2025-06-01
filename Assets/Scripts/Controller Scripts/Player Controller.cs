@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameObject depthCharge;
     [SerializeField] private GameObject dcManager;
+    [SerializeField] public GameObject gameOverScreen;
+    [SerializeField] public GameObject scoreText;
+
+    [SerializeField] public int score;
 
     private ulong depth = 0;
 
@@ -144,6 +149,10 @@ public class PlayerController : MonoBehaviour
         {
             facingRight = true;
         }
+    }
+
+    public void UpdateScoreText() {
+        scoreText.GetComponent<Text>().text = "Score: " + score;
     }
 
 }

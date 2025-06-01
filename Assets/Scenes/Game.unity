@@ -410,6 +410,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   depthCharge: {fileID: 2971507064577391741, guid: b7fef87f7e62b6a4f9fd72138831a1a5, type: 3}
   dcManager: {fileID: 262585261}
+  gameOverScreen: {fileID: 1509755504}
+  scoreText: {fileID: 1633580796}
+  score: 0
   timePlayed: 0
   timeHeldSpace: 0
 --- !u!212 &398656402

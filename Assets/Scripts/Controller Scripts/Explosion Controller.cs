@@ -62,13 +62,17 @@ public class ExplosionController : MonoBehaviour
             // before reactivating
             other.gameObject.GetComponent<EnemyController>().statsChanged = false;
             other.gameObject.GetComponent<EnemyController>().WaitToRespawn();
+
+            var player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+            player.score += 1;
+            player.UpdateScoreText();
+
         }
 
-        /*
         if (other.gameObject.name == "Player")
         {
             other.gameObject.SetActive(false);
+            other.gameObject.GetComponent<PlayerController>().gameOverScreen.SetActive(true);
         }
-        */
     }
 }
