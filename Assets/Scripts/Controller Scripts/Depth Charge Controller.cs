@@ -38,23 +38,9 @@ public class DepthChargeController : MonoBehaviour
             if (timer >= spawnDuration)
             {
                 timer = 0;
-
-                // TODO:
-                // figure out why explosion animations are only playing SOMETIMES
-                for (int i = 0; i < expManager.GetComponent<ObjectPooler>().objList.Count; i++)
-                {
-                    GameObject exp = expManager.GetComponent<ObjectPooler>().ObjectManager();
-
-                    // if object is NOT active, that means we can use it
-                    if (exp != null)
-                    {
-                        // sets available explosion effect to active
-                        exp.SetActive(true);
-
-                        //creates explosion at the depth charge position before it deactivates
-                        exp.GetComponent<ExplosionController>().CreateExplosion(gameObject.transform.position);
-                    }
-                }
+                GameObject exp = expManager.GetComponent<ObjectPooler>().ObjectManager();
+                exp.SetActive(true);
+                exp.GetComponent<ExplosionController>().CreateExplosion(gameObject.transform.position);
 
                 gameObject.SetActive(false);
             }
