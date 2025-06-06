@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.GameCenter;
 using static UnityEditor.PlayerSettings;
@@ -8,9 +9,8 @@ using static UnityEditor.PlayerSettings;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private GameObject bubbleParticles;
-    private GameObject torpManager;
-
-    private PlayerController playerController;
+    private ObjectPooler torpManager;
+    private GameManager gameManager;
 
     protected float timeSinceLastTorpedo = 0f;
     protected float timeUntilNextTorpedo;
@@ -19,7 +19,6 @@ public class EnemyController : MonoBehaviour
 
     private float speed = 0, depth;
 
-    public bool statsChanged = false;
     private bool facingRight = true;
 
     // plays sonar sound to introduce new submarine
@@ -28,14 +27,13 @@ public class EnemyController : MonoBehaviour
 
     void Awake()
     {
-        torpManager = GameObject.Find("Torpedo Manager");
-        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        torpManager = GameObject.Find("Torpedo Manager").GetComponent<ObjectPooler>();
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
 
         source = gameObject.GetComponent<AudioSource>();
         source.clip = sonarClip;
 
-        if (!statsChanged)
-            Setup();
+        Setup();
     }
 
     private void Setup()
@@ -65,8 +63,6 @@ public class EnemyController : MonoBehaviour
         }
 
         gameObject.transform.position = spawnPos;
-
-        statsChanged = true;
     }
 
     void Flip()
@@ -95,7 +91,7 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (playerController.isGameActive && gameObject.activeSelf)
+        if (gameManager.isGameActive && gameObject.activeSelf)
         {
             // updates current position variable to transform
             currentPos = gameObject.transform.position;
@@ -135,7 +131,7 @@ public class EnemyController : MonoBehaviour
 
     void TorpedoHandler(Vector3 subPos)
     {
-        GameObject torp = torpManager.GetComponent<ObjectPooler>().ObjectManager();
+        GameObject torp = torpManager.ObjectManager();
 
         if (torp != null)
         {
@@ -151,8 +147,7 @@ public class EnemyController : MonoBehaviour
     {
         if (!gameObject.activeSelf)
         {
-            if (!statsChanged)
-                Setup();
+            Setup();
 
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 0);
         }
@@ -162,7 +157,7 @@ public class EnemyController : MonoBehaviour
     {
         // sets up the audio source and audio clip components
         // so that when the enemy spawns, a sonar sound will play
-        if (playerController.isGameActive)
+        if (gameManager.isGameActive)
         {
             source.Play();
         }

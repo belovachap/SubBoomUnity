@@ -8,8 +8,8 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private GameObject dcDisplay;
     [SerializeField] private GameObject dcManager;
+    [SerializeField] private GameManager gameManager;
 
-    public bool isGameActive = false;
     private bool facingRight = true;
     private float timeHeldSpace = 0f;
 
@@ -21,14 +21,14 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        isGameActive = true;
+        gameManager.isGameActive = true;
     }
 
     // Update is called once per frame
     void Update()
     {
         // if the game is active, the player can interact using the destroyer
-        if (isGameActive == true)
+        if (gameManager.isGameActive == true)
         {
             Vector3 pos = gameObject.transform.position;
             float horInput = Input.GetAxisRaw("Horizontal");
@@ -63,10 +63,12 @@ public class PlayerController : MonoBehaviour
             DepthChargeInputs(pos);
         }
 
-        if (!gameObject.activeInHierarchy && isGameActive)
+        /*
+        if (!gameObject.activeInHierarchy && gameManager.isGameActive)
         {
-            isGameActive = false;
+            gameManager.isGameActive = false;
         }
+        */
     }
 
     private void DepthChargeInputs(Vector3 playerPos)

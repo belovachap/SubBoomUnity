@@ -410,7 +410,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dcDisplay: {fileID: 2971507064027676057}
   dcManager: {fileID: 262585261}
-  isGameActive: 0
+  gameManager: {fileID: 2032010684}
 --- !u!212 &398656402
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1630,7 +1630,7 @@ GameObject:
   - component: {fileID: 2032010685}
   - component: {fileID: 2032010684}
   m_Layer: 0
-  m_Name: GUI Manager
+  m_Name: Game Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1651,7 +1651,7 @@ MonoBehaviour:
   scoreText: {fileID: 1633580798}
   highScoreText: {fileID: 1868636431}
   gameOverScreen: {fileID: 1509755504}
-  playerController: {fileID: 398656401}
+  isGameActive: 0
 --- !u!4 &2032010685
 Transform:
   m_ObjectHideFlags: 0

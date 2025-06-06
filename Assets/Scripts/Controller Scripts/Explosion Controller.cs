@@ -5,18 +5,17 @@ using UnityEngine;
 public class ExplosionController : MonoBehaviour
 {
     private float timer = 0.0f;
-    private int score = 0;
     private readonly float duration = 1.5f;
     private readonly float scale = 0.75f;
 
     private AudioSource source;
     [SerializeField] private AudioClip[] explosionClips = new AudioClip[5];
 
-    private GUIManager guiManager;
+    private GameManager gameManager;
 
     private void Start()
     {
-        guiManager = GameObject.Find("GUI Manager").GetComponent<GUIManager>();
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
 
         source = gameObject.GetComponent<AudioSource>();
         PlaySpawnSound();
@@ -56,26 +55,20 @@ public class ExplosionController : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Enemy"))
+        if (other.CompareTag("Enemy") && other.gameObject.activeInHierarchy)
         {
             // TODO:
             // figure out how to set a timer to delay the respawn of the submarine
-            other.gameObject.GetComponent<EnemyController>().statsChanged = false;
-            other.gameObject.GetComponent<EnemyController>().WaitToRespawn();
-
             other.gameObject.SetActive(false);
 
-            score += 10;
-            guiManager.AddScore(score);
+            other.GetComponent<EnemyController>().WaitToRespawn();
+
+            gameManager.UpdateScore(10);
         }
-        else if (other.gameObject.CompareTag("Player"))
+        else if (other.CompareTag("Player"))
         {
             other.gameObject.SetActive(false);
-            guiManager.GameOverScreen();
-        }
-        else if (!other.gameObject.CompareTag("Player") && !other.gameObject.CompareTag("Enemy"))
-        {
-
+            gameManager.GameOverScreen();
         }
     }
 }

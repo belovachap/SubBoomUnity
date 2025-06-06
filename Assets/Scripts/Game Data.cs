@@ -7,14 +7,9 @@ using UnityEngine;
 
 public class GameData : MonoBehaviour
 {
-    public ulong totalGamesPlayed = 0;
-    public ulong totalSecondsPlayed = 0;
-
-    public ulong lastScore = 0;
-    public string lastScoreDateTime = "";
-
-    public ulong highScore = 0;
-    public string highScoreDateTime = "";
+    public int totalGamesPlayed, lastScore, highScore;
+    public float totalSecondsPlayed;
+    public string lastScoreDateTime = "", highScoreDateTime = "";
 
     public static GameData Instance { get; set; }
 
@@ -36,13 +31,13 @@ public class GameData : MonoBehaviour
     [System.Serializable]
     class SaveData
     {
-        public ulong totalGamesPlayed = 0;
-        public ulong totalSecondsPlayed = 0;
+        public int totalGamesPlayed = 0;
+        public float totalSecondsPlayed = 0;
 
-        public ulong lastScore = 0;
+        public int lastScore = 0;
         public string lastScoreDateTime = "";
 
-        public ulong highScore = 0;
+        public int highScore = 0;
         public string highScoreDateTime = "";
     }
 

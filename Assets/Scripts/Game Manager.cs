@@ -7,22 +7,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GUIManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     [SerializeField] private Text scoreText;
     [SerializeField] private Text highScoreText;
 
     [SerializeField] private GameObject gameOverScreen;
-    [SerializeField] private PlayerController playerController;
 
-    private ulong score = 0;
-    private float timePlayed = 0.0f;
+    private int score;
+    private float timePlayed;
 
-    // GameData gd = GameData.Instance;
+    public bool isGameActive = false;
 
     private void Start()
     {
-        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
         gameOverScreen.SetActive(false);
 
         highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString();
@@ -30,15 +28,15 @@ public class GUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (playerController.isGameActive)
+        if (isGameActive)
         {
             timePlayed += Time.deltaTime;
         }
     }
 
-    public void AddScore(int incAmount)
+    public void UpdateScore(int incAmount)
     {
-        score = (ulong)incAmount;
+        score += incAmount;
         scoreText.text = "Score: " + score.ToString();
 
         if (score >= GameData.Instance.highScore)
@@ -49,13 +47,10 @@ public class GUIManager : MonoBehaviour
 
     public void GameOverScreen()
     {
-        if (!gameOverScreen.activeSelf)
-        {
-            gameOverScreen.SetActive(true);
-            playerController.isGameActive = false;
+        gameOverScreen.SetActive(true);
+        isGameActive = false;
 
-            SaveGameStats();
-        }
+        SaveGameStats();
     }
 
     public void RestartClick()
@@ -73,7 +68,7 @@ public class GUIManager : MonoBehaviour
         DateTime now = DateTime.Now;
 
         GameData.Instance.totalGamesPlayed += 1;
-        GameData.Instance.totalSecondsPlayed += (ulong)timePlayed;
+        GameData.Instance.totalSecondsPlayed += timePlayed;
 
         GameData.Instance.lastScore = score;
         GameData.Instance.lastScoreDateTime = now.ToString();
