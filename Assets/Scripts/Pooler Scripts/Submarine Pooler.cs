@@ -5,7 +5,7 @@ using System;
 
 public class SubmarinePooler : ObjectPooler
 {
-    private float timeSinceSubAdded = 0.0f;
+    private float timeSinceSubAdded = 3.0f;
     public override GameObject ObjectManager()
     {
         // adds time to timeSinceSubAdded
@@ -21,7 +21,7 @@ public class SubmarinePooler : ObjectPooler
                 if (!objList[i].activeInHierarchy)
                 {
                     objList[i].SetActive(true);
-                    objList[i].GetComponent<EnemyController>().PlaySpawnSound();
+                    objList[i].GetComponent<EnemyController>().source.Play();
                     break;
                 }
             }

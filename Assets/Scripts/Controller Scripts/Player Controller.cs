@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,17 +16,10 @@ public class PlayerController : MonoBehaviour
     private const float dcSpeed = 0.8f;
     private Vector3 dcDistance;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        gameManager.isGameActive = true;
-    }
-
-    // Update is called once per frame
     void Update()
     {
         // if the game is active, the player can interact using the destroyer
-        if (gameManager.isGameActive == true)
+        if (gameManager.IsGameActive == true)
         {
             Vector3 pos = gameObject.transform.position;
             float horInput = Input.GetAxisRaw("Horizontal");
@@ -62,13 +53,6 @@ public class PlayerController : MonoBehaviour
 
             DepthChargeInputs(pos);
         }
-
-        /*
-        if (!gameObject.activeInHierarchy && gameManager.isGameActive)
-        {
-            gameManager.isGameActive = false;
-        }
-        */
     }
 
     private void DepthChargeInputs(Vector3 playerPos)

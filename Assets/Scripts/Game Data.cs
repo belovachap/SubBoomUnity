@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class GameData : MonoBehaviour
@@ -57,27 +56,6 @@ public class GameData : MonoBehaviour
         string json = JsonUtility.ToJson(data);
 
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
-
-        /*
-        string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
-        try
-        {
-            Directory.CreateDirectory(Application.persistentDataPath);
-            string jsonData = JsonUtility.ToJson(data, true);
-            using (FileStream stream = new(filePath, FileMode.Create))
-            {
-                using (StreamWriter writer = new(stream))
-                {
-                    writer.Write(jsonData);
-                }
-            }
-        }
-
-        catch (Exception e)
-        {
-            Debug.LogError("Error saving GameData object: " + e);
-        }
-        */
     }
 
     public void Load()
@@ -98,36 +76,5 @@ public class GameData : MonoBehaviour
             highScore = data.highScore;
             highScoreDateTime = data.highScoreDateTime;
         }
-
-        /*
-        string filePath = Path.Combine(Application.persistentDataPath, "gamedata.json");
-
-        try
-        {
-            string jsonData = "";
-            using (FileStream stream = new(filePath, FileMode.Open))
-            {
-                using (StreamReader reader = new(stream))
-                {
-                    jsonData = reader.ReadToEnd();
-                }
-            }
-
-            GameData data = JsonUtility.FromJson<GameData>(jsonData);
-            totalGamesPlayed = data.totalGamesPlayed;
-            totalSecondsPlayed = data.totalSecondsPlayed;
-
-            lastScore = data.lastScore;
-            lastScoreDateTime = data.lastScoreDateTime;
-
-            highScore = data.highScore;
-            highScoreDateTime = data.highScoreDateTime;
-        }
-         
-        catch (Exception e)
-        {
-            Debug.Log("Error loading GameData object: " + e);
-        }
-        */
     }
 }

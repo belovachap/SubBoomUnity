@@ -5,11 +5,11 @@ using UnityEngine;
 public class ExplosionController : MonoBehaviour
 {
     private float timer = 0.0f;
-    private readonly float duration = 1.5f;
-    private readonly float scale = 0.75f;
+    private readonly float duration = 1.0f;
+    private readonly float scale = 0.8f;
 
     private AudioSource source;
-    [SerializeField] private AudioClip[] explosionClips = new AudioClip[5];
+    // [SerializeField] private AudioClip explosionSound;
 
     private GameManager gameManager;
 
@@ -49,7 +49,7 @@ public class ExplosionController : MonoBehaviour
 
     private void PlaySpawnSound()
     {
-        source.clip = explosionClips[UnityEngine.Random.Range(0, 5)];
+        // source.clip = explosionSound;
         source.Play();
     }
 

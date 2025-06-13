@@ -13,10 +13,35 @@ using UnityEditor;
 [DefaultExecutionOrder(1000)]
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private Text gamesPlayedText, secondsPlayedText, lastScoreText, highScoreText;
+    [Header("Text")]
+    [SerializeField] private Text gamesPlayedText;
+    [SerializeField] private Text secondsPlayedText;
+    [SerializeField] private Text lastScoreText;
+    [SerializeField] private Text highScoreText;
+
+    [Header("UI Screens")]
+    [SerializeField] private GameObject mainMenuScreen;
+    [SerializeField] private GameObject settingsScreen;
+    [SerializeField] private GameObject howToPlayScreen;
+    [SerializeField] private GameObject creditsScreen;
+
+    private AudioSource[] sounds;
+    private AudioSource music;
+    private AudioSource buttonPressSFX;
 
     public void Start() {
         GameData.Instance.Load();
+
+        MainMenuClick();
+
+        // grabs all the audio source components in the game object
+        sounds = gameObject.GetComponents<AudioSource>();
+
+        // plays music for the main menu scene
+        music = sounds[0];
+
+        // gets the button press sound effect to play
+        buttonPressSFX = sounds[1];
 
         gamesPlayedText.text = "Games Played: " + GameData.Instance.totalGamesPlayed.ToString();
         secondsPlayedText.text = "Seconds Played: " + GameData.Instance.totalSecondsPlayed.ToString();
@@ -42,11 +67,16 @@ public class MainMenu : MonoBehaviour
 
     public void StartButtonClick()
     {
+        buttonPressSFX.Play();
+        music.Stop();
+
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public void QuitButtonClick()
     {
+        buttonPressSFX.Play();
+
         GameData.Instance.Save();
 
         #if UNITY_EDITOR
@@ -54,5 +84,43 @@ public class MainMenu : MonoBehaviour
         #else
             Application.Quit();
         #endif
+    }
+
+    public void SettingsClick()
+    {
+        buttonPressSFX.Play();
+    }
+
+    public void HowToPlayClick()
+    {
+        buttonPressSFX.Play();
+    }
+
+    public void CreditsClick()
+    {
+        buttonPressSFX.Play();
+
+        mainMenuScreen.SetActive(false);
+        creditsScreen.SetActive(true);
+    }
+
+    public void MainMenuClick()
+    {
+        buttonPressSFX.Play();
+
+        mainMenuScreen.SetActive(true);
+
+        if (settingsScreen.activeInHierarchy)
+        {
+            settingsScreen.SetActive(false);
+        }
+        else if (howToPlayScreen.activeInHierarchy)
+        {
+            howToPlayScreen.SetActive(false);
+        }
+        else if (creditsScreen.activeInHierarchy)
+        {
+            creditsScreen.SetActive(false);
+        }
     }
 }

@@ -4877,7 +4877,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ed251deea019d245af85d6e3531bed4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnDuration: 0
   dropClip: {fileID: 8300000, guid: 358dcd34c171654d1822c9809cf257c8, type: 3}
 --- !u!212 &1093625323282240227
 SpriteRenderer:
@@ -4941,7 +4940,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 358dcd34c171654d1822c9809cf257c8, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

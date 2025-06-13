@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,21 +13,33 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject gameOverScreen;
 
+    private AudioSource source;
+    [SerializeField] private AudioClip[] soundsList = new AudioClip[3];
+
     private int score;
     private float timePlayed;
 
-    public bool isGameActive = false;
+    public bool IsGameActive {get; private set; }
 
     private void Start()
     {
+        // sets game over screen to inactive
         gameOverScreen.SetActive(false);
 
+        // loads high score if one is already found
         highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString();
+
+        // plays music for the game scene
+        source = gameObject.GetComponent<AudioSource>();
+        source.Play();
+
+        // game is currently active, and the player can control the destroyer
+        IsGameActive = true;
     }
 
     private void Update()
     {
-        if (isGameActive)
+        if (IsGameActive)
         {
             timePlayed += Time.deltaTime;
         }
@@ -48,18 +59,26 @@ public class GameManager : MonoBehaviour
     public void GameOverScreen()
     {
         gameOverScreen.SetActive(true);
-        isGameActive = false;
+        IsGameActive = false;
+
+        source.clip = soundsList[1];
+        source.loop = false;
+        source.Play();
 
         SaveGameStats();
     }
 
     public void RestartClick()
     {
+        PlayButtonSFX();
+
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public void MainMenuClick()
     {
+        PlayButtonSFX();
+
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
@@ -82,12 +101,9 @@ public class GameManager : MonoBehaviour
         GameData.Instance.Save();
     }
 
-    public void QuitButtonClick()
+    private void PlayButtonSFX()
     {
-        #if UNITY_EDITOR
-             EditorApplication.ExitPlaymode();
-        #else
-             Application.Quit();
-        #endif
+        source.clip = soundsList[2];
+        source.Play();
     }
 }

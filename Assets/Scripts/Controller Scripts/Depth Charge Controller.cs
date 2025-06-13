@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public class DepthChargeController : MonoBehaviour
@@ -10,14 +9,14 @@ public class DepthChargeController : MonoBehaviour
     private Vector3 distance;
 
     private AudioSource source;
-    [SerializeField] private AudioClip dropClip;
+    // [SerializeField] private AudioClip dropClip;
 
     private GameObject expManager;
 
     void Start()
     {
         source = gameObject.GetComponent<AudioSource>();
-        source.clip = dropClip;
+        // source.clip = dropClip;
         source.Play();
 
         expManager = GameObject.Find("Explosion Manager");
