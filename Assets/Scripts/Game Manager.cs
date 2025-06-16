@@ -1,40 +1,46 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Text scoreText;
-    [SerializeField] private Text highScoreText;
+    [Header("Text")]
+    [SerializeField] Text scoreText;
+    [SerializeField] Text highScoreText;
 
-    [SerializeField] private GameObject gameOverScreen;
-
-    private AudioSource source;
-    [SerializeField] private AudioClip[] soundsList = new AudioClip[3];
+    [Header("UI Screens")]
+    [SerializeField] GameObject gameOverScreen;
+    private GameObject settingsScreen;
 
     private int score;
     private float timePlayed;
 
     public bool IsGameActive {get; private set; }
+    private bool isSettingsOpen = false;
+
+    AudioManager audioManager;
+
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        settingsScreen = GameObject.Find("Game Data/Canvas/Volume Settings");
+    }
 
     private void Start()
     {
-        // sets game over screen to inactive
+        // game is currently active, and the player can control the destroyer
+        IsGameActive = true;
+
+        // sets game over screen and settings screen to inactive for precautionary measure
         gameOverScreen.SetActive(false);
+        settingsScreen.SetActive(false);
+
+        // plays in-game music
+        audioManager.PlayMusic(audioManager.inGameMusic);
 
         // loads high score if one is already found
         highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString();
-
-        // plays music for the game scene
-        source = gameObject.GetComponent<AudioSource>();
-        source.Play();
-
-        // game is currently active, and the player can control the destroyer
-        IsGameActive = true;
     }
 
     private void Update()
@@ -61,23 +67,39 @@ public class GameManager : MonoBehaviour
         gameOverScreen.SetActive(true);
         IsGameActive = false;
 
-        source.clip = soundsList[1];
-        source.loop = false;
-        source.Play();
+        audioManager.PlaySFX(audioManager.gameOverSFX);
 
         SaveGameStats();
     }
 
+    public void SettingsScreen()
+    {
+        if (!isSettingsOpen)
+        {
+            IsGameActive = false;
+            settingsScreen.SetActive(true);
+
+            isSettingsOpen = true;
+        }
+        else
+        {
+            IsGameActive = true;
+            settingsScreen.SetActive(false);
+
+            isSettingsOpen = false;
+        }
+    }
+
     public void RestartClick()
     {
-        PlayButtonSFX();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
 
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public void MainMenuClick()
     {
-        PlayButtonSFX();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
 
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
@@ -99,11 +121,5 @@ public class GameManager : MonoBehaviour
         }
 
         GameData.Instance.Save();
-    }
-
-    private void PlayButtonSFX()
-    {
-        source.clip = soundsList[2];
-        source.Play();
     }
 }

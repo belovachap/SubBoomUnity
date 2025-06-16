@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DepthChargeController : MonoBehaviour
@@ -8,23 +6,18 @@ public class DepthChargeController : MonoBehaviour
     private float spawnDuration = 0;
     private Vector3 distance;
 
-    private AudioSource source;
-    // [SerializeField] private AudioClip dropClip;
+    private ObjectPooler expManager;
+    private GameManager gameManager;
 
-    private GameObject expManager;
-
-    void Start()
+    void Awake()
     {
-        source = gameObject.GetComponent<AudioSource>();
-        // source.clip = dropClip;
-        source.Play();
-
-        expManager = GameObject.Find("Explosion Manager");
+        expManager = GameObject.Find("Explosion Manager").GetComponent<ObjectPooler>();
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
 
     private void Update()
     {
-        if (gameObject.activeSelf)
+        if (gameObject.activeSelf && gameManager.IsGameActive)
         {
             // vertical movement of depth charge
             transform.Translate(distance);
@@ -37,7 +30,8 @@ public class DepthChargeController : MonoBehaviour
             if (timer >= spawnDuration)
             {
                 timer = 0;
-                GameObject exp = expManager.GetComponent<ObjectPooler>().ObjectManager();
+
+                GameObject exp = expManager.ObjectManager();
                 exp.SetActive(true);
                 exp.GetComponent<ExplosionController>().CreateExplosion(gameObject.transform.position);
 

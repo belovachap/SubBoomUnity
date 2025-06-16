@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,6 +5,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject dcDisplay;
     [SerializeField] private GameObject dcManager;
     [SerializeField] private GameManager gameManager;
+    private AudioManager audioManager;
 
     private bool facingRight = true;
     private float timeHeldSpace = 0f;
@@ -16,8 +15,20 @@ public class PlayerController : MonoBehaviour
     private const float dcSpeed = 0.8f;
     private Vector3 dcDistance;
 
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
+
     void Update()
     {
+        // if the player inputs 'escape'
+        // opens settings, regardless if game is active (in case game is paused)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            gameManager.SettingsScreen();
+        }
+
         // if the game is active, the player can interact using the destroyer
         if (gameManager.IsGameActive == true)
         {
@@ -50,8 +61,7 @@ public class PlayerController : MonoBehaviour
                 pos.x = -9.5f;
                 gameObject.transform.position = pos;
             }
-
-            DepthChargeInputs(pos);
+                DepthChargeInputs(pos);
         }
     }
 
@@ -103,6 +113,7 @@ public class PlayerController : MonoBehaviour
             dc.GetComponent<DepthChargeController>().SetDistance(dcDistance);
 
             dc.SetActive(true);
+            audioManager.PlaySFX(audioManager.depthChargeSFX);
         }
     }
 
@@ -122,5 +133,4 @@ public class PlayerController : MonoBehaviour
             facingRight = true;
         }
     }
-
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Explosion
+  - Audio
   layers:
   - Default
   - TransparentFX

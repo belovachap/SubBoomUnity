@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class TorpedoController : MonoBehaviour
@@ -8,35 +5,28 @@ public class TorpedoController : MonoBehaviour
     public const float speed = 1.25f;
     private float angle;
 
-    private GameObject expManager, player;
+    private GameObject player;
 
     private Vector3 playerPos, direction;
 
     private bool check = false;
 
-    private AudioSource source;
-    [SerializeField] private AudioClip dropClip;
+    private ObjectPooler expManager;
+    private AudioManager audioManager;
+    private GameManager gameManager;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        /*
-        source = gameObject.GetComponent<AudioSource>();
-        source.clip = dropClip;
-        source.Play();
-        */
-
-        Debug.Log("TODO: Play Torpedo Sound!");
-
         player = GameObject.FindGameObjectWithTag("Player");
-
-        expManager = GameObject.Find("Explosion Manager");
+        expManager = GameObject.Find("Explosion Manager").GetComponent<ObjectPooler>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (gameObject.activeSelf)
+        if (gameObject.activeSelf && gameManager.IsGameActive)
         {
             if (!check)
             {
@@ -51,6 +41,9 @@ public class TorpedoController : MonoBehaviour
                 // rotates torpedo to the direction of the player
                 transform.Rotate(0, 0, angle);
 
+                // plays torpedo spawn sound effect
+                audioManager.PlaySFX(audioManager.torpedoSFX);
+
                 check = true;
             }
 
@@ -63,7 +56,7 @@ public class TorpedoController : MonoBehaviour
             {
                 check = false;
 
-                GameObject exp = expManager.GetComponent<ObjectPooler>().ObjectManager();
+                GameObject exp = expManager.ObjectManager();
 
                 // if object is NOT active, that means we can use it
                 if (exp != null)

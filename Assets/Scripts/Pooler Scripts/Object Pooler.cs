@@ -6,9 +6,10 @@ using UnityEngine.Pool;
 
 public class ObjectPooler : MonoBehaviour
 {
+    [SerializeField] GameManager gameManager;
+
     protected GameObject managerObj;
     [SerializeField] protected GameObject poolerObj;
-
     [SerializeField] protected int numObjs;
 
     public List<GameObject> objList;
@@ -20,7 +21,10 @@ public class ObjectPooler : MonoBehaviour
 
     private void Update()
     {
-        ObjectManager();
+        if (gameManager.IsGameActive)
+        {
+            ObjectManager();
+        }
     }
 
     protected void SpawnObjects()

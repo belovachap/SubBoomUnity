@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -14,34 +12,32 @@ using UnityEditor;
 public class MainMenu : MonoBehaviour
 {
     [Header("Text")]
-    [SerializeField] private Text gamesPlayedText;
-    [SerializeField] private Text secondsPlayedText;
-    [SerializeField] private Text lastScoreText;
-    [SerializeField] private Text highScoreText;
+    [SerializeField] Text gamesPlayedText;
+    [SerializeField] Text secondsPlayedText;
+    [SerializeField] Text lastScoreText;
+    [SerializeField] Text highScoreText;
 
     [Header("UI Screens")]
-    [SerializeField] private GameObject mainMenuScreen;
-    [SerializeField] private GameObject settingsScreen;
-    [SerializeField] private GameObject howToPlayScreen;
-    [SerializeField] private GameObject creditsScreen;
+    [SerializeField] GameObject mainMenuScreen;
+    [SerializeField] GameObject settingsScreen;
+    [SerializeField] GameObject howToPlayScreen;
+    [SerializeField] GameObject creditsScreen;
 
-    private AudioSource[] sounds;
-    private AudioSource music;
-    private AudioSource buttonPressSFX;
+    [Header("Buttons")]
+    [SerializeField] GameObject mainMenuButton;
 
-    public void Start() {
+    AudioManager audioManager;
+
+    private void Awake()
+    {
         GameData.Instance.Load();
 
-        MainMenuClick();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
-        // grabs all the audio source components in the game object
-        sounds = gameObject.GetComponents<AudioSource>();
-
-        // plays music for the main menu scene
-        music = sounds[0];
-
-        // gets the button press sound effect to play
-        buttonPressSFX = sounds[1];
+    public void Start()
+    {
+        audioManager.PlayMusic(audioManager.menuMusic);
 
         gamesPlayedText.text = "Games Played: " + GameData.Instance.totalGamesPlayed.ToString();
         secondsPlayedText.text = "Seconds Played: " + GameData.Instance.totalSecondsPlayed.ToString();
@@ -67,15 +63,14 @@ public class MainMenu : MonoBehaviour
 
     public void StartButtonClick()
     {
-        buttonPressSFX.Play();
-        music.Stop();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
 
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public void QuitButtonClick()
     {
-        buttonPressSFX.Play();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
 
         GameData.Instance.Save();
 
@@ -88,27 +83,40 @@ public class MainMenu : MonoBehaviour
 
     public void SettingsClick()
     {
-        buttonPressSFX.Play();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
+
+        mainMenuScreen.SetActive(false);
+
+        mainMenuButton.SetActive(true);
+        settingsScreen.SetActive(true);
     }
 
     public void HowToPlayClick()
     {
-        buttonPressSFX.Play();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
+
+        mainMenuScreen.SetActive(false);
+
+        mainMenuButton.SetActive(true);
+        howToPlayScreen.SetActive(true);
     }
 
     public void CreditsClick()
     {
-        buttonPressSFX.Play();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
 
         mainMenuScreen.SetActive(false);
+
+        mainMenuButton.SetActive(true);
         creditsScreen.SetActive(true);
     }
 
     public void MainMenuClick()
     {
-        buttonPressSFX.Play();
+        audioManager.PlaySFX(audioManager.buttonPressSFX);
 
         mainMenuScreen.SetActive(true);
+        mainMenuButton.SetActive(false);
 
         if (settingsScreen.activeInHierarchy)
         {

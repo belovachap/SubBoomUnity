@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -17,17 +15,10 @@ public class EnemyController : MonoBehaviour
 
     private bool facingRight = true;
 
-    // plays sonar sound to introduce new submarine
-    public AudioSource source { get; private set; }
-    // [SerializeField] private AudioClip sonarClip;
-
     void Awake()
     {
         torpManager = GameObject.Find("Torpedo Manager").GetComponent<ObjectPooler>();
         gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
-
-        source = gameObject.GetComponent<AudioSource>();
-        // source.clip = sonarClip;
 
         Setup();
     }
@@ -59,8 +50,6 @@ public class EnemyController : MonoBehaviour
         }
 
         gameObject.transform.position = spawnPos;
-
-        // source.Play();
     }
 
     void Flip()
@@ -150,16 +139,4 @@ public class EnemyController : MonoBehaviour
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 0);
         }
     }
-
-    /*
-    public void PlaySpawnSound()
-    {
-        // sets up the audio source and audio clip components
-        // so that when the enemy spawns, a sonar sound will play
-        if (gameManager.IsGameActive)
-        {
-            source.Play();
-        }
-    }
-    */
 }

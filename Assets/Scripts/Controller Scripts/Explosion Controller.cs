@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ExplosionController : MonoBehaviour
@@ -8,27 +6,25 @@ public class ExplosionController : MonoBehaviour
     private readonly float duration = 1.0f;
     private readonly float scale = 0.8f;
 
-    private AudioSource source;
-    // [SerializeField] private AudioClip explosionSound;
-
     private GameManager gameManager;
+    private AudioManager audioManager;
 
-    private void Start()
+    private void Awake()
     {
         gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
-
-        source = gameObject.GetComponent<AudioSource>();
-        PlaySpawnSound();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     private void Update()
     {
-        if (gameObject.activeSelf)
+        if (gameObject.activeSelf && gameManager.IsGameActive)
         {
             if (timer < duration)
             {
                 timer += Time.deltaTime;
                 gameObject.transform.localScale += new Vector3(Time.deltaTime * scale, Time.deltaTime * scale, 1);
+
+                audioManager.PlaySFX(audioManager.explosionSFX);
             }
 
             if (timer >= duration)
@@ -44,21 +40,12 @@ public class ExplosionController : MonoBehaviour
     public void CreateExplosion(Vector3 spawnPosition)
     {
         gameObject.transform.position = spawnPosition;
-        // PlaySpawnSound();
-    }
-
-    private void PlaySpawnSound()
-    {
-        // source.clip = explosionSound;
-        source.Play();
     }
 
     public void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy") && other.gameObject.activeInHierarchy)
         {
-            // TODO:
-            // figure out how to set a timer to delay the respawn of the submarine
             other.gameObject.SetActive(false);
 
             other.GetComponent<EnemyController>().WaitToRespawn();
