@@ -10,21 +10,15 @@ public class VolumeManager : MonoBehaviour
     [Header("Sliders")]
     [SerializeField] Slider masterVolumeSlider;
     [SerializeField] Slider musicSlider;
-    [SerializeField] Slider sfxSlider;
+    [SerializeField] Slider soundSlider;
 
+    // TODO (6/16/2025)
+    // figure out why volume settings arent being saved
+    // once player exits setting screen menu and closes game
     private void Start()
     {
         // if previous settings are found, we'll load the previous volume settings
-        if (PlayerPrefs.HasKey("masterVolume") || PlayerPrefs.HasKey("music") || PlayerPrefs.HasKey("sfx"))
-        {
-            LoadVolume();
-        }
-        else
-        {
-            SetMusicVolume();
-            SetMasterVolume();
-            SetSoundVolume();
-        }
+        LoadVolume();
     }
 
     // master volume slider
@@ -32,7 +26,7 @@ public class VolumeManager : MonoBehaviour
     {
         float volume = masterVolumeSlider.value;
         mixer.SetFloat("masterVolume", Mathf.Log10(volume) * 20);
-        PlayerPrefs.SetFloat("masterVolume", volume);
+        GameData.Instance.masterVolume = volume;
     }
 
     // music volume slider
@@ -40,26 +34,22 @@ public class VolumeManager : MonoBehaviour
     {
         float volume = musicSlider.value;
         mixer.SetFloat("music", Mathf.Log10(volume) * 20);
-        PlayerPrefs.SetFloat("music", volume);
+        GameData.Instance.musicVolume = volume;
     }
 
     // sound volume slider
     public void SetSoundVolume()
     {
-        float volume = sfxSlider.value;
+        float volume = soundSlider.value;
         mixer.SetFloat("sfx", Mathf.Log10(volume) * 20);
-        PlayerPrefs.SetFloat("sfx", volume);
+        GameData.Instance.soundVolume = volume;
     }
 
     // loads volume settings
     private void LoadVolume()
     {
-        masterVolumeSlider.value = PlayerPrefs.GetFloat("masterVolume");
-        musicSlider.value = PlayerPrefs.GetFloat("music");
-        sfxSlider.value = PlayerPrefs.GetFloat("sfx");
-
-        SetMasterVolume();
-        SetMusicVolume();
-        SetSoundVolume();
+        masterVolumeSlider.value = GameData.Instance.masterVolume;
+        musicSlider.value = GameData.Instance.musicVolume;
+        soundSlider.value = GameData.Instance.soundVolume;
     }
 }

@@ -19,12 +19,12 @@ public class ExplosionController : MonoBehaviour
     {
         if (gameObject.activeSelf && gameManager.IsGameActive)
         {
+            audioManager.PlaySFX(audioManager.explosionSFX);
+
             if (timer < duration)
             {
                 timer += Time.deltaTime;
                 gameObject.transform.localScale += new Vector3(Time.deltaTime * scale, Time.deltaTime * scale, 1);
-
-                audioManager.PlaySFX(audioManager.explosionSFX);
             }
 
             if (timer >= duration)

@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 
     [Header("UI Screens")]
     [SerializeField] GameObject gameOverScreen;
-    private GameObject settingsScreen;
+    [SerializeField] GameObject settingsScreen;
 
     private int score;
     private float timePlayed;
@@ -24,7 +24,6 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
-        settingsScreen = GameObject.Find("Game Data/Canvas/Volume Settings");
     }
 
     private void Start()
