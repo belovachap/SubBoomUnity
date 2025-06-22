@@ -66,6 +66,7 @@ public class GameManager : MonoBehaviour
         gameOverScreen.SetActive(true);
         IsGameActive = false;
 
+        audioManager.StopMusic();
         audioManager.PlaySFX(audioManager.gameOverSFX);
 
         SaveGameStats();
