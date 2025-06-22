@@ -33,7 +33,7 @@ public class DepthChargeController : MonoBehaviour
 
                 GameObject exp = expManager.ObjectManager();
                 exp.SetActive(true);
-                exp.GetComponent<ExplosionController>().CreateExplosion(gameObject.transform.position);
+                exp.GetComponent<ExplosionController>().CreateExplosion(gameObject.transform.position, gameObject);
 
                 gameObject.SetActive(false);
             }

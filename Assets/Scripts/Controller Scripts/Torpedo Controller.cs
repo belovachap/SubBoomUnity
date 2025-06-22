@@ -65,7 +65,7 @@ public class TorpedoController : MonoBehaviour
                     exp.SetActive(true);
 
                     //creates explosion at the depth charge position before it deactivates
-                    exp.GetComponent<ExplosionController>().CreateExplosion(transform.position);
+                    exp.GetComponent<ExplosionController>().CreateExplosion(transform.position, gameObject);
                 }
 
                 gameObject.SetActive(false);

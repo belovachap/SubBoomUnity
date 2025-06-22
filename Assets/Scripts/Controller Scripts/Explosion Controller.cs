@@ -9,6 +9,8 @@ public class ExplosionController : MonoBehaviour
     private GameManager gameManager;
     private AudioManager audioManager;
 
+    private GameObject explodingObj;
+
     private void Awake()
     {
         gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
@@ -37,9 +39,11 @@ public class ExplosionController : MonoBehaviour
         }
     }
 
-    public void CreateExplosion(Vector3 spawnPosition)
+    public void CreateExplosion(Vector3 spawnPosition, GameObject incObj)
     {
         gameObject.transform.position = spawnPosition;
+        explodingObj = incObj;
+
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -52,7 +56,7 @@ public class ExplosionController : MonoBehaviour
 
             gameManager.UpdateScore(10);
         }
-        else if (other.CompareTag("Player"))
+        else if (other.CompareTag("Player") && !explodingObj.CompareTag("Depth Charge"))
         {
             other.gameObject.SetActive(false);
             gameManager.GameOverScreen();
