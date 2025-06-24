@@ -21,8 +21,6 @@ public class ExplosionController : MonoBehaviour
     {
         if (gameObject.activeSelf && gameManager.IsGameActive)
         {
-            audioManager.PlaySFX(audioManager.explosionSFX);
-
             if (timer < duration)
             {
                 timer += Time.deltaTime;
@@ -41,9 +39,14 @@ public class ExplosionController : MonoBehaviour
 
     public void CreateExplosion(Vector3 spawnPosition, GameObject incObj)
     {
+        // set explosion object's position to game object that will explode
         gameObject.transform.position = spawnPosition;
+
+        // set object that is being exploded to incoming object
         explodingObj = incObj;
 
+        // play explosion spawn sound effect
+        audioManager.PlaySFX(audioManager.explosionSFX);
     }
 
     public void OnTriggerEnter2D(Collider2D other)
