@@ -2931,7 +2931,7 @@ MonoBehaviour:
   depthChargeSFX: {fileID: 8300000, guid: 37c7feb4274d8ac489f767085af5c835, type: 3}
   torpedoSFX: {fileID: 8300000, guid: a7e3c9469ecff2e44bd7b59ee59e2e8f, type: 3}
   explosionSFX: {fileID: 8300000, guid: f6509286036340048bcd372635bb6bb3, type: 3}
-  gameOverSFX: {fileID: 8300000, guid: 8769697c0ca782d4c85d1387395692ba, type: 3}
+  gameOverSFX: {fileID: 8300000, guid: b8553787946abcd44bc44488d0ca9f74, type: 3}
 --- !u!1 &1840133592
 GameObject:
   m_ObjectHideFlags: 0
