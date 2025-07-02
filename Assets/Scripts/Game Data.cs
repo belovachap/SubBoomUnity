@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class GameData : MonoBehaviour
 {
-    public int totalGamesPlayed, lastScore, highScore;
-    public float totalSecondsPlayed, masterVolume, musicVolume, soundVolume;
+    public int totalGamesPlayed, totalSecondsPlayed, lastScore, highScore;
+    public float masterVolume, musicVolume, soundVolume;
     public string lastScoreDateTime = "", highScoreDateTime = "";
 
     public static GameData Instance { get; set; }
@@ -28,7 +28,7 @@ public class GameData : MonoBehaviour
     class SaveData
     {
         public int totalGamesPlayed = 0;
-        public float totalSecondsPlayed = 0;
+        public int totalSecondsPlayed = 0;
 
         public int lastScore = 0;
         public string lastScoreDateTime = "";
@@ -36,8 +36,6 @@ public class GameData : MonoBehaviour
         public int highScore = 0;
         public string highScoreDateTime = "";
 
-        // TODO (6/16/2025)
-        // volume bug could happen here
         public float masterVolume = 1;
         public float musicVolume = 1;
         public float soundVolume = 1;
@@ -45,35 +43,31 @@ public class GameData : MonoBehaviour
 
     public void Save()
     {
-        SaveData data = new SaveData();
+        SaveData data = new()
+        {
+            totalGamesPlayed = totalGamesPlayed,
+            totalSecondsPlayed = totalSecondsPlayed,
 
-        data.totalGamesPlayed = totalGamesPlayed;
-        data.totalSecondsPlayed = totalSecondsPlayed;
+            lastScore = lastScore,
+            lastScoreDateTime = lastScoreDateTime,
 
-        data.lastScore = lastScore;
-        data.lastScoreDateTime = lastScoreDateTime;
+            highScore = highScore,
+            highScoreDateTime = highScoreDateTime,
 
-        data.highScore = highScore;
-        data.highScoreDateTime = highScoreDateTime;
+            masterVolume = masterVolume,
+            musicVolume = musicVolume,
+            soundVolume = soundVolume
+        };
 
-        data.masterVolume = masterVolume;
-        data.musicVolume = musicVolume;
-        data.soundVolume = soundVolume;
-
-        string json = JsonUtility.ToJson(data);
-
-        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+        PlayerPrefs.SetString("Data", JsonUtility.ToJson(data));
     }
 
     public void Load()
     {
-        string path = Application.persistentDataPath + "/savefile.json";
+        var data = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString("Data"));
 
-        if (File.Exists(path))
+        if (data != null)
         {
-            string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
-
             totalGamesPlayed = data.totalGamesPlayed;
             totalSecondsPlayed = data.totalSecondsPlayed;
 

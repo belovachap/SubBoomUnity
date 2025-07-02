@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        // while the player is in the game,
+        // it will keep track of how much the player has played
         if (IsGameActive)
         {
             timePlayed += Time.deltaTime;
@@ -52,6 +54,7 @@ public class GameManager : MonoBehaviour
 
     public void UpdateScore(int incAmount)
     {
+        // updates score in-game
         score += incAmount;
         scoreText.text = "Score: " + score.ToString();
 
@@ -109,7 +112,7 @@ public class GameManager : MonoBehaviour
         DateTime now = DateTime.Now;
 
         GameData.Instance.totalGamesPlayed += 1;
-        GameData.Instance.totalSecondsPlayed += timePlayed;
+        GameData.Instance.totalSecondsPlayed += (int)timePlayed;
 
         GameData.Instance.lastScore = score;
         GameData.Instance.lastScoreDateTime = now.ToString();

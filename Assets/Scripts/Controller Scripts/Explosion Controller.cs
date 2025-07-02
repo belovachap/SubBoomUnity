@@ -4,7 +4,7 @@ public class ExplosionController : MonoBehaviour
 {
     private float timer = 0.0f;
     private readonly float duration = 1.0f;
-    private readonly float scale = 0.8f;
+    private readonly float scale = 0.7f;
 
     private GameManager gameManager;
     private AudioManager audioManager;

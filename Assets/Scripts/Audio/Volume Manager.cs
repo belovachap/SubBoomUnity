@@ -17,7 +17,16 @@ public class VolumeManager : MonoBehaviour
     private void Start()
     {
         // if previous settings are found, we'll load the previous volume settings
-        LoadVolume();
+        if (GameData.Instance.totalGamesPlayed == 0)
+        {
+            masterVolumeSlider.value = 1;
+            musicSlider.value = 1;
+            soundSlider.value = 1;
+        }
+        else
+        {
+            LoadVolume();
+        }
     }
 
     // master volume slider
@@ -44,6 +53,8 @@ public class VolumeManager : MonoBehaviour
         GameData.Instance.soundVolume = soundVolume;
     }
 
+    // when player releases mouse button,
+    // volume settings will save
     public void OnMouseUp()
     {
         GameData.Instance.masterVolume = masterVolume;
@@ -54,6 +65,8 @@ public class VolumeManager : MonoBehaviour
     // loads volume settings
     private void LoadVolume()
     {
+        GameData.Instance.Load();
+
         masterVolumeSlider.value = GameData.Instance.masterVolume;
         musicSlider.value = GameData.Instance.musicVolume;
         soundSlider.value = GameData.Instance.soundVolume;

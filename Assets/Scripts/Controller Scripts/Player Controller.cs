@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     private bool facingRight = true;
     private float timeHeldSpace = 0f;
 
-    private const float speed = 3f;
+    private const float speed = 3f, bounds = 8.2f;
 
     private const float dcSpeed = 0.8f;
     private Vector3 dcDistance;
@@ -49,16 +49,16 @@ public class PlayerController : MonoBehaviour
             }
 
             // right boundary
-            if (pos.x > 9.5f)
+            if (pos.x > bounds)
             {
-                pos.x = 9.5f;
+                pos.x = bounds;
                 gameObject.transform.position = pos;
             }
 
             // left boundary
-            if (pos.x < -9.5f)
+            if (pos.x < -bounds)
             {
-                pos.x = -9.5f;
+                pos.x = -bounds;
                 gameObject.transform.position = pos;
             }
                 DepthChargeInputs(pos);
