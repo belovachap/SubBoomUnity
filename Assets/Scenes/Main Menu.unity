@@ -763,9 +763,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totalGamesPlayed: 0
+  totalSecondsPlayed: 0
   lastScore: 0
   highScore: 0
-  totalSecondsPlayed: 0
   masterVolume: 0
   musicVolume: 0
   soundVolume: 0
@@ -2001,8 +2001,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -50}
-  m_SizeDelta: {x: 600, y: 450}
+  m_AnchoredPosition: {x: 0, y: -3.28}
+  m_SizeDelta: {x: 600, y: 543.45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1412373668
 MonoBehaviour:
@@ -2037,43 +2037,11 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Font
-
-    Upheaval - Aenigma Fonts
-
-
-    Main Menu Music
-
-    Ignis -
-    Scott Buckley
-
-
-    In-Game Music
-
-    Chase - Alexander Nakarada
-
-
-    Depth
-    Charge SFX
-
-    Depth Charge Short - Mike Koenig
-
-
-    Submarine Spawn SFX
-
-    Submarine
-    Sonar - MArtian
-
-
-    Torpedo SFX
-
-    Explosion Ultra Bass - Mark Diangelo
-
-
-    Explosion
-    SFX, Button Press SFX, Game Over SFX
-
-    SFBGames'' ChipTone'
+  m_Text: "Developers\nNikki Malmanger\nChapman Shoop\n \nFont\nUpheaval - Aenigma
+    Fonts\n\nMain Menu Music\nIgnis - Scott Buckley\n\nIn-Game Music\nChase - Alexander
+    Nakarada\n\nDepth Charge SFX\nDepth Charge Short - Mike Koenig\n\nSubmarine Spawn
+    SFX\nSubmarine Sonar - MArtian\n\nTorpedo SFX\nExplosion Ultra Bass - Mark Diangelo\n\nExplosion
+    SFX, Button Press SFX, Game Over SFX\nSFBGames' ChipTone"
 --- !u!222 &1412373669
 CanvasRenderer:
   m_ObjectHideFlags: 0
