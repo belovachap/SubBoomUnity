@@ -2037,10 +2037,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Developers\nNikki Malmanger\nChapman Shoop\n \nFont\nUpheaval - Aenigma
-    Fonts\n\nMain Menu Music\nIgnis - Scott Buckley\n\nIn-Game Music\nChase - Alexander
-    Nakarada\n\nDepth Charge SFX\nDepth Charge Short - Mike Koenig\n\nSubmarine Spawn
-    SFX\nSubmarine Sonar - MArtian\n\nTorpedo SFX\nExplosion Ultra Bass - Mark Diangelo\n\nExplosion
+  m_Text: "Developers\nSpise\nChapman Shoop\n \nFont\nUpheaval - Aenigma Fonts\n\nMain
+    Menu Music\nIgnis - Scott Buckley\n\nIn-Game Music\nChase - Alexander Nakarada\n\nDepth
+    Charge SFX\nDepth Charge Short - Mike Koenig\n\nSubmarine Spawn SFX\nSubmarine
+    Sonar - MArtian\n\nTorpedo SFX\nExplosion Ultra Bass - Mark Diangelo\n\nExplosion
     SFX, Button Press SFX, Game Over SFX\nSFBGames' ChipTone"
 --- !u!222 &1412373669
 CanvasRenderer:
