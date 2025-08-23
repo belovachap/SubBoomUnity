@@ -1,12 +1,10 @@
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameData : MonoBehaviour
 {
-    public int totalGamesPlayed, totalSecondsPlayed, lastScore, highScore;
-    public float masterVolume, musicVolume, soundVolume;
-    public string lastScoreDateTime = "", highScoreDateTime = "";
-
+    public SaveData data;
     public static GameData Instance { get; set; }
 
     private void Awake()
@@ -20,12 +18,13 @@ public class GameData : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+
         Load();
     }
 
-
     [System.Serializable]
-    class SaveData
+    public class SaveData
     {
         public int totalGamesPlayed = 0;
         public int totalSecondsPlayed = 0;
@@ -43,43 +42,28 @@ public class GameData : MonoBehaviour
 
     public void Save()
     {
-        SaveData data = new()
-        {
-            totalGamesPlayed = totalGamesPlayed,
-            totalSecondsPlayed = totalSecondsPlayed,
-
-            lastScore = lastScore,
-            lastScoreDateTime = lastScoreDateTime,
-
-            highScore = highScore,
-            highScoreDateTime = highScoreDateTime,
-
-            masterVolume = masterVolume,
-            musicVolume = musicVolume,
-            soundVolume = soundVolume
-        };
-
+        Debug.Log("Saving Game Data");
         PlayerPrefs.SetString("Data", JsonUtility.ToJson(data));
     }
 
     public void Load()
     {
-        var data = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString("Data"));
+        Debug.Log("Loading Game Data");
+        data = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString("Data"));
 
-        if (data != null)
+        if (data == null)
         {
-            totalGamesPlayed = data.totalGamesPlayed;
-            totalSecondsPlayed = data.totalSecondsPlayed;
-
-            lastScore = data.lastScore;
-            lastScoreDateTime = data.lastScoreDateTime;
-
-            highScore = data.highScore;
-            highScoreDateTime = data.highScoreDateTime;
-
-            masterVolume = data.masterVolume;
-            musicVolume = data.musicVolume;
-            soundVolume = data.soundVolume;
+            data = new SaveData();
         }
+    }
+
+    void OnApplicationQuit()
+    {
+        Save();
+    }
+
+    void OnActiveSceneChanged(Scene current, Scene next)
+    {
+        Save();
     }
 }

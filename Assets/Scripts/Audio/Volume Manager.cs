@@ -16,17 +16,9 @@ public class VolumeManager : MonoBehaviour
 
     private void Start()
     {
-        // if previous settings are found, we'll load the previous volume settings
-        if (GameData.Instance.totalGamesPlayed == 0)
-        {
-            masterVolumeSlider.value = 1;
-            musicSlider.value = 1;
-            soundSlider.value = 1;
-        }
-        else
-        {
-            LoadVolume();
-        }
+        masterVolumeSlider.value = GameData.Instance.data.masterVolume;
+        musicSlider.value = GameData.Instance.data.musicVolume;
+        soundSlider.value = GameData.Instance.data.soundVolume;
     }
 
     // master volume slider
@@ -34,7 +26,7 @@ public class VolumeManager : MonoBehaviour
     {
         masterVolume = masterVolumeSlider.value;
         mixer.SetFloat("masterVolume", Mathf.Log10(masterVolume) * 20);
-        GameData.Instance.masterVolume = masterVolume;
+        GameData.Instance.data.masterVolume = masterVolume;
     }
 
     // music volume slider
@@ -42,7 +34,7 @@ public class VolumeManager : MonoBehaviour
     {
         musicVolume = musicSlider.value;
         mixer.SetFloat("music", Mathf.Log10(musicVolume) * 20);
-        GameData.Instance.musicVolume = musicVolume;
+        GameData.Instance.data.musicVolume = musicVolume;
     }
 
     // sound volume slider
@@ -50,25 +42,6 @@ public class VolumeManager : MonoBehaviour
     {
         soundVolume = soundSlider.value;
         mixer.SetFloat("sfx", Mathf.Log10(soundVolume) * 20);
-        GameData.Instance.soundVolume = soundVolume;
-    }
-
-    // when player releases mouse button,
-    // volume settings will save
-    public void OnMouseUp()
-    {
-        GameData.Instance.masterVolume = masterVolume;
-        GameData.Instance.musicVolume = musicVolume;
-        GameData.Instance.soundVolume = soundVolume;
-    }
-
-    // loads volume settings
-    private void LoadVolume()
-    {
-        GameData.Instance.Load();
-
-        masterVolumeSlider.value = GameData.Instance.masterVolume;
-        musicSlider.value = GameData.Instance.musicVolume;
-        soundSlider.value = GameData.Instance.soundVolume;
+        GameData.Instance.data.soundVolume = soundVolume;
     }
 }
