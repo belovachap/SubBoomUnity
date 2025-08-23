@@ -30,8 +30,6 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        GameData.Instance.Load();
-
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
@@ -39,25 +37,25 @@ public class MainMenu : MonoBehaviour
     {
         audioManager.PlayMusic(audioManager.menuMusic);
 
-        gamesPlayedText.text = "Games Played: " + GameData.Instance.totalGamesPlayed.ToString();
-        secondsPlayedText.text = "Seconds Played: " + GameData.Instance.totalSecondsPlayed.ToString();
+        gamesPlayedText.text = "Games Played: " + GameData.Instance.data.totalGamesPlayed.ToString();
+        secondsPlayedText.text = "Seconds Played: " + GameData.Instance.data.totalSecondsPlayed.ToString();
 
-        if (GameData.Instance.lastScoreDateTime == "")
+        if (GameData.Instance.data.lastScoreDateTime == "")
         {
             lastScoreText.text = "";
         }
         else
         {
-            lastScoreText.text = "Last Score: " + GameData.Instance.lastScore.ToString() + " on " + GameData.Instance.lastScoreDateTime;
+            lastScoreText.text = "Last Score: " + GameData.Instance.data.lastScore.ToString() + " on " + GameData.Instance.data.lastScoreDateTime;
         }
 
-        if (GameData.Instance.highScoreDateTime == "")
+        if (GameData.Instance.data.highScoreDateTime == "")
         {
             highScoreText.text = "";
         }
         else
         {
-            highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString() + " on " + GameData.Instance.highScoreDateTime;
+            highScoreText.text = "High Score: " + GameData.Instance.data.highScore.ToString() + " on " + GameData.Instance.data.highScoreDateTime;
         }
     }
 

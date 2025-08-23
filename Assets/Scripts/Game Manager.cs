@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
         audioManager.PlayMusic(audioManager.inGameMusic);
 
         // loads high score if one is already found
-        highScoreText.text = "High Score: " + GameData.Instance.highScore.ToString();
+        highScoreText.text = "High Score: " + GameData.Instance.data.highScore.ToString();
     }
 
     private void Update()
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
         score += incAmount;
         scoreText.text = "Score: " + score.ToString();
 
-        if (score >= GameData.Instance.highScore)
+        if (score >= GameData.Instance.data.highScore)
         {
             highScoreText.text = "High Score: " + score.ToString();
         }
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
         audioManager.StopMusic();
         audioManager.PlaySFX(audioManager.gameOverSFX);
 
-        SaveGameStats();
+        UpdateGameStats();
     }
 
     public void SettingsScreen()
@@ -107,22 +107,20 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
-    private void SaveGameStats()
+    private void UpdateGameStats()
     {
         DateTime now = DateTime.Now;
 
-        GameData.Instance.totalGamesPlayed += 1;
-        GameData.Instance.totalSecondsPlayed += (int)timePlayed;
+        GameData.Instance.data.totalGamesPlayed += 1;
+        GameData.Instance.data.totalSecondsPlayed += (int)timePlayed;
 
-        GameData.Instance.lastScore = score;
-        GameData.Instance.lastScoreDateTime = now.ToString();
+        GameData.Instance.data.lastScore = score;
+        GameData.Instance.data.lastScoreDateTime = now.ToString();
 
-        if (score >= GameData.Instance.highScore)
+        if (score >= GameData.Instance.data.highScore)
         {
-            GameData.Instance.highScore = score;
-            GameData.Instance.highScoreDateTime = now.ToString();
+            GameData.Instance.data.highScore = score;
+            GameData.Instance.data.highScoreDateTime = now.ToString();
         }
-
-        GameData.Instance.Save();
     }
 }
